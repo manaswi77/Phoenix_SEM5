@@ -1,10 +1,17 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, Button, StyleSheet } from "react-native";
+import { useScreenContext } from "../../contexts/HomeScreenContext";
 
 const InfoScreen: React.FC = () => {
+  const { setCurrentScreen } = useScreenContext();
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Hello User</Text>
+      <Button
+        onPress={() => setCurrentScreen("welcome")}
+        title="back to welcome"
+      />
     </View>
   );
 };

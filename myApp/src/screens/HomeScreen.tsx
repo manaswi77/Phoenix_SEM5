@@ -38,7 +38,7 @@ const HomeScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.mainContainer}>
       {renderScreen()}
       {isLoggedIn && <BottomNavigation />}
     </View>
@@ -46,8 +46,11 @@ const HomeScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  mainContainer: {
     flex: 1,
+    backgroundColor: "#ceb3f5",
+    paddingTop: 30,
+    paddingBottom: 5,
   },
 });
 

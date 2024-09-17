@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Button, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useScreenContext } from "../contexts/HomeScreenContext";
 
 const BottomNavigation: React.FC = () => {
@@ -7,11 +7,36 @@ const BottomNavigation: React.FC = () => {
 
   return (
     <View style={styles.navContainer}>
-      <Button title="Chatbot" onPress={() => setCurrentScreen("chatbot")} />
-      <Button title="Security" onPress={() => setCurrentScreen("security")} />
-      <Button title="Home" onPress={() => setCurrentScreen("info")} />
-      <Button title="Community" onPress={() => setCurrentScreen("community")} />
-      <Button title="Settings" onPress={() => setCurrentScreen("settings")} />
+      <TouchableOpacity
+        style={styles.navButton}
+        onPress={() => setCurrentScreen("chatbot")}
+      >
+        <Text style={styles.navText}>Chatbot</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.navButton}
+        onPress={() => setCurrentScreen("security")}
+      >
+        <Text style={styles.navText}>Security</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.navButton}
+        onPress={() => setCurrentScreen("info")}
+      >
+        <Text style={styles.navText}>Home</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.navButton}
+        onPress={() => setCurrentScreen("community")}
+      >
+        <Text style={styles.navText}>Community</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.navButton}
+        onPress={() => setCurrentScreen("settings")}
+      >
+        <Text style={styles.navText}>Settings</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -22,9 +47,23 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: "100%",
     flexDirection: "row",
+    flexWrap: "wrap",
     justifyContent: "space-around",
     backgroundColor: "#fff",
     paddingVertical: 10,
+  },
+  navButton: {
+    alignItems: "center",
+    padding: 10,
+  },
+  navIcon: {
+    width: 25,
+    height: 25,
+    borderWidth: 4,
+  },
+  navText: {
+    marginTop: 5,
+    color: "#000",
   },
 });
 

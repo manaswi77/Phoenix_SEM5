@@ -72,6 +72,10 @@ const RegisterScreen: React.FC = () => {
               title="Already have an account? Login"
               onPress={() => setCurrentScreen("login")}
             />
+            <Button
+              onPress={() => setCurrentScreen("welcome")}
+              title="back to welcome"
+            />
           </>
         )}
       </Formik>
