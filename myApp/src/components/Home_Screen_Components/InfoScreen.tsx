@@ -1,16 +1,22 @@
 import React from "react";
 import { View, Text, Button, StyleSheet } from "react-native";
-import { useScreenContext } from "../../contexts/HomeScreenContext";
+import { useDispatch } from "react-redux";
+import { setCurrentScreen } from "../../contexts/screenSlice";
+import { AppDispatch } from "../../store/store"; 
 
 const InfoScreen: React.FC = () => {
-  const { setCurrentScreen } = useScreenContext();
+  const dispatch = useDispatch<AppDispatch>(); 
+
+  const handlePress = () => {
+    dispatch(setCurrentScreen("welcome")); 
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Hello User</Text>
       <Button
-        onPress={() => setCurrentScreen("welcome")}
-        title="back to welcome"
+        onPress={handlePress}
+        title="Back to Welcome"
       />
     </View>
   );

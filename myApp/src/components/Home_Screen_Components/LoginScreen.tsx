@@ -2,7 +2,9 @@ import React from "react";
 import { View, Text, Button, TextInput, StyleSheet } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { useScreenContext } from "../../contexts/HomeScreenContext";
+import { useDispatch } from "react-redux";
+import { setIsLoggedIn, setCurrentScreen } from "../../contexts/screenSlice";
+import { AppDispatch } from "../../store/store"; 
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
@@ -13,7 +15,9 @@ const LoginSchema = Yup.object().shape({
 });
 
 const LoginScreen: React.FC = () => {
-  const { setIsLoggedIn, setCurrentScreen } = useScreenContext();
+
+  // TODO: Add firebase API Calls to login
+  const dispatch = useDispatch<AppDispatch>();
 
   return (
     <View style={styles.container}>
@@ -21,8 +25,8 @@ const LoginScreen: React.FC = () => {
         initialValues={{ email: "", password: "" }}
         validationSchema={LoginSchema}
         onSubmit={() => {
-          setIsLoggedIn(true);
-          setCurrentScreen("info");
+          dispatch(setIsLoggedIn(true));
+          dispatch(setCurrentScreen("info"));
         }}
       >
         {({
@@ -58,11 +62,11 @@ const LoginScreen: React.FC = () => {
             <Button onPress={handleSubmit as any} title="Login" />
             <Button
               title="Don't have an account? Register"
-              onPress={() => setCurrentScreen("register")}
+              onPress={() => dispatch(setCurrentScreen("register"))}
             />
             <Button
-              onPress={() => setCurrentScreen("welcome")}
-              title="back to welcome"
+              onPress={() => dispatch(setCurrentScreen("welcome"))}
+              title="Back to welcome"
             />
           </>
         )}

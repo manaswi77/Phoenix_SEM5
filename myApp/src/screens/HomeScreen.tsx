@@ -5,14 +5,18 @@ import LoginScreen from "../components/Home_Screen_Components/LoginScreen";
 import RegisterScreen from "../components/Home_Screen_Components/RegisterScreen";
 import InfoScreen from "../components/Home_Screen_Components/InfoScreen";
 import BottomNavigation from "../components/BottomNavigation";
-import { useScreenContext } from "../contexts/HomeScreenContext";
 import ChatbotScreen from "./ChatbotScreen";
 import CommunityScreen from "./CommunityScreen";
 import SettingsScreen from "./SettingsScreen";
 import SecurityScreen from "./SecurityScreen";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
 
 const HomeScreen: React.FC = () => {
-  const { isLoggedIn, currentScreen } = useScreenContext();
+  const isLoggedIn = useSelector((state: RootState) => state.screen.isLoggedIn);
+  const currentScreen = useSelector(
+    (state: RootState) => state.screen.currentScreen
+  );
 
   const renderScreen = () => {
     switch (currentScreen) {

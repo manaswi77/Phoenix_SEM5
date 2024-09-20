@@ -7,10 +7,16 @@ import {
   Image,
   SafeAreaView,
 } from "react-native";
-import { useScreenContext } from "../../contexts/HomeScreenContext";
+import { useDispatch } from "react-redux";
+import { setCurrentScreen } from "../../contexts/screenSlice";
+import { AppDispatch } from "../../store/store"; 
 
 const WelcomeScreen: React.FC = () => {
-  const { setCurrentScreen } = useScreenContext();
+  const dispatch = useDispatch<AppDispatch>(); 
+
+  const handlePress = (screen: "login" | "register") => {
+    dispatch(setCurrentScreen(screen));
+  };
 
   return (
     <SafeAreaView style={styles.welcomeMainContainer}>
@@ -21,18 +27,18 @@ const WelcomeScreen: React.FC = () => {
         style={styles.image}
       />
       <Text>
-        Hi There! I'm Shreeyash Dongarkar. I like cats. and i hate dr. strange
+        Hi There! I'm Shreeyash Dongarkar. I like cats. and I hate Dr. Strange.
       </Text>
       <View style={styles.welcomeScreenButtonContainer}>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => setCurrentScreen("login")}
+          onPress={() => handlePress("login")}
         >
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => setCurrentScreen("register")}
+          onPress={() => handlePress("register")}
         >
           <Text style={styles.buttonText}>Register</Text>
         </TouchableOpacity>

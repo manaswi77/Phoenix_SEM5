@@ -1,39 +1,47 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { useScreenContext } from "../contexts/HomeScreenContext";
+import { useDispatch, useSelector } from "react-redux";
+import { setCurrentScreen } from "../contexts/screenSlice";
+import { RootState, AppDispatch } from "../store/store"; 
+import { ScreenState } from "../types/types";
 
 const BottomNavigation: React.FC = () => {
-  const { setCurrentScreen } = useScreenContext();
+  const dispatch = useDispatch<AppDispatch>();
+  const currentScreen = useSelector((state: RootState) => state.screen.currentScreen);
+
+  const handlePress = (screen: ScreenState) => {
+    dispatch(setCurrentScreen(screen));
+  };
 
   return (
     <View style={styles.navContainer}>
       <TouchableOpacity
         style={styles.navButton}
-        onPress={() => setCurrentScreen("chatbot")}
+        onPress={() => handlePress('chatbot')}
       >
         <Text style={styles.navText}>Chatbot</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.navButton}
-        onPress={() => setCurrentScreen("security")}
+        onPress={() => handlePress('security')}
       >
         <Text style={styles.navText}>Security</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.navButton}
-        onPress={() => setCurrentScreen("info")}
+        onPress={() => handlePress('info')}
       >
         <Text style={styles.navText}>Home</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.navButton}
-        onPress={() => setCurrentScreen("community")}
+        onPress={() => handlePress('community')}
       >
         <Text style={styles.navText}>Community</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.navButton}
-        onPress={() => setCurrentScreen("settings")}
+        onPress={() => handlePress('settings')}
       >
         <Text style={styles.navText}>Settings</Text>
       </TouchableOpacity>

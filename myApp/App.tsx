@@ -1,15 +1,13 @@
 import React from "react";
-import { ScreenProvider } from "./src/contexts/HomeScreenContext";
+import { Provider } from "react-redux"; 
 import HomeScreen from "./src/screens/HomeScreen";
-import { NavigationContainer } from "@react-navigation/native";
+import { store } from "./src/store/store"; 
 
 const App: React.FC = () => {
   return (
-    <ScreenProvider>
-      <NavigationContainer>
+    <Provider store={store}> 
         <HomeScreen />
-      </NavigationContainer>
-    </ScreenProvider>
+    </Provider>
   );
 };
 
