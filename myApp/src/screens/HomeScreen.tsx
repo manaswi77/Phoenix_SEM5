@@ -52,7 +52,7 @@ const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: "#ceb3f5",
+    backgroundColor: "#f8e6fc",
     paddingTop: 30,
     paddingBottom: 5,
   },

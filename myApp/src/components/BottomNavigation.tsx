@@ -1,13 +1,15 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { setCurrentScreen } from "../contexts/screenSlice";
-import { RootState, AppDispatch } from "../store/store"; 
+import { RootState, AppDispatch } from "../store/store";
 import { ScreenState } from "../types/types";
 
 const BottomNavigation: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const currentScreen = useSelector((state: RootState) => state.screen.currentScreen);
+  const currentScreen = useSelector(
+    (state: RootState) => state.screen.currentScreen
+  );
 
   const handlePress = (screen: ScreenState) => {
     dispatch(setCurrentScreen(screen));
@@ -17,31 +19,31 @@ const BottomNavigation: React.FC = () => {
     <View style={styles.navContainer}>
       <TouchableOpacity
         style={styles.navButton}
-        onPress={() => handlePress('chatbot')}
+        onPress={() => handlePress("chatbot")}
       >
         <Text style={styles.navText}>Chatbot</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.navButton}
-        onPress={() => handlePress('security')}
+        onPress={() => handlePress("security")}
       >
         <Text style={styles.navText}>Security</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.navButton}
-        onPress={() => handlePress('info')}
+        onPress={() => handlePress("info")}
       >
         <Text style={styles.navText}>Home</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.navButton}
-        onPress={() => handlePress('community')}
+        onPress={() => handlePress("community")}
       >
         <Text style={styles.navText}>Community</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.navButton}
-        onPress={() => handlePress('settings')}
+        onPress={() => handlePress("settings")}
       >
         <Text style={styles.navText}>Settings</Text>
       </TouchableOpacity>
@@ -59,6 +61,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     backgroundColor: "#fff",
     paddingVertical: 10,
+  },
+  navigationIcon: {
+    height: 30,
+    width: 30,
+    borderWidth: 1,
+    backgroundColor: "red",
   },
   navButton: {
     alignItems: "center",
