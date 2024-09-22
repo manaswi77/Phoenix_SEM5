@@ -1,6 +1,7 @@
 export type ScreenState =
   | "welcome"
   | "login"
+  | "forgotPassword"
   | "register"
   | "info"
   | "chatbot"
@@ -8,6 +9,8 @@ export type ScreenState =
   | "home"
   | "community"
   | "settings";
+
+export type ForgotPasswordStage = "mail" | "otp" | "changed" | "successful";
 
 export interface User {
   id: number;

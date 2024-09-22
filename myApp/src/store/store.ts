@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import screenReducer from "../contexts/screenSlice";
 import communityPostReducer from "../contexts/communityPostsSlice";
+import changePasswordReducer from "../contexts/changePasswordSlice";
 
 export const store = configureStore({
   reducer: {
     screen: screenReducer,
     communityPosts: communityPostReducer,
+    changePassword: changePasswordReducer,
   },
 });
 

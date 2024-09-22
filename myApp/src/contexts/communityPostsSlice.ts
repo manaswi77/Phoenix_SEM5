@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { Post, Comment } from "../types/types";
+import { Post } from "../types/types";
 import { LikeResponse, CommentResponse } from "../types/types";
 import { likePost, commentOnPost } from "../services/communityPostService";
 

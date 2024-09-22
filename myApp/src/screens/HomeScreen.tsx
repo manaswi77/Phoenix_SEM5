@@ -9,6 +9,7 @@ import ChatbotScreen from "./ChatbotScreen";
 import CommunityScreen from "./CommunityScreen";
 import SettingsScreen from "./SettingsScreen";
 import SecurityScreen from "./SecurityScreen";
+import ForgotPasswordScreen from "./ForgotPasswordScreen";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 
@@ -36,6 +37,8 @@ const HomeScreen: React.FC = () => {
         return <SettingsScreen />;
       case "security":
         return <SecurityScreen />;
+      case "forgotPassword":
+        return <ForgotPasswordScreen />;
       default:
         return null;
     }

@@ -66,7 +66,9 @@ const LoginScreen: React.FC = () => {
             {touched.password && errors.password ? (
               <Text style={styles.inputError}>{errors.password}</Text>
             ) : null}
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => dispatch(setCurrentScreen("forgotPassword"))}
+            >
               <Text style={styles.forgotPassword}>Forgot Password ?</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -132,7 +134,6 @@ const styles = StyleSheet.create({
   loginMessage: {
     fontSize: 35,
     marginBottom: 40,
-    fontFamily: "Urbanist_400Regular", // Updated font to Urbanist
   },
   loginMailInput: {
     borderColor: "#AE81D9",
