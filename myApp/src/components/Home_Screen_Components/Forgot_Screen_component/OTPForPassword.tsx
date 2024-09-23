@@ -43,67 +43,74 @@ const OTPVerification: React.FC = () => {
   };
 
   return (
-    <Formik
-      initialValues={{ otp: "" }}
-      validationSchema={OTPSchema}
-      onSubmit={handleOTPSubmission}
-    >
-      {({ handleSubmit, errors, touched, setFieldValue }) => (
-        <View style={styles.container}>
-          <Text style={styles.title}>Enter OTP</Text>
+    <View style={styles.OTPcontainer}>
+      <Text style={styles.OTPVerificationTitle}>OTP verification</Text>
+      <Text style={styles.infoContainer}>
+        Enter the verification code we just sent to your email.
+      </Text>
 
-          <View style={styles.otpContainer}>
-            {otpValues.map((otp, index) => (
-              <TextInput
-                key={index}
-                style={styles.otpInput}
-                keyboardType="numeric"
-                maxLength={1}
-                value={otp}
-                onChangeText={(value) =>
-                  handleOtpChange(value, index, setFieldValue)
-                }
-              />
-            ))}
+      <Formik
+        initialValues={{ otp: "" }}
+        validationSchema={OTPSchema}
+        onSubmit={handleOTPSubmission}
+      >
+        {({ handleSubmit, errors, touched, setFieldValue }) => (
+          <View>
+            <View style={styles.OTPCode}>
+              {otpValues.map((otp, index) => (
+                <TextInput
+                  key={index}
+                  style={styles.OTPInput}
+                  keyboardType="numeric"
+                  maxLength={1}
+                  value={otp}
+                  onChangeText={(value) =>
+                    handleOtpChange(value, index, setFieldValue)
+                  }
+                />
+              ))}
+            </View>
+
+            {errors.otp && touched.otp && (
+              <Text style={styles.errorText}>{errors.otp}</Text>
+            )}
+
+            <TouchableOpacity
+              style={styles.OTPVerifyButton}
+              onPress={() => {
+                handleSubmit();
+              }}
+            >
+              <Text style={styles.OTPSubmitText}>Verify</Text>
+            </TouchableOpacity>
           </View>
-
-          {errors.otp && touched.otp && (
-            <Text style={styles.errorText}>{errors.otp}</Text>
-          )}
-
-          <TouchableOpacity
-            style={styles.submitButton}
-            onPress={() => {
-              handleSubmit();
-            }}
-          >
-            <Text style={styles.submitText}>Submit</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-    </Formik>
+        )}
+      </Formik>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  OTPcontainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     padding: 20,
   },
-  title: {
+  OTPVerificationTitle: {
     fontSize: 24,
     marginBottom: 20,
     fontWeight: "bold",
   },
-  otpContainer: {
+  infoContainer: {
+    flexDirection: "row",
+    marginBottom: 20,
+  },
+  OTPCode: {
     flexDirection: "row",
     justifyContent: "space-between",
     width: "80%",
     marginBottom: 20,
   },
-  otpInput: {
+  OTPInput: {
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 5,
@@ -116,13 +123,13 @@ const styles = StyleSheet.create({
     color: "red",
     marginBottom: 20,
   },
-  submitButton: {
-    backgroundColor: "#2196F3",
-    paddingVertical: 10,
-    paddingHorizontal: 40,
+  OTPVerifyButton: {
+    backgroundColor: "#7A4791",
+    padding: 14,
     borderRadius: 5,
+    alignItems: "center",
   },
-  submitText: {
+  OTPSubmitText: {
     color: "#fff",
     fontSize: 18,
   },

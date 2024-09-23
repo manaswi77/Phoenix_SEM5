@@ -33,8 +33,13 @@ const ResetPasswordScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Create New Password</Text>
+    <View style={styles.resetPassContainer}>
+      <Text style={styles.newPassText}>Create New Password</Text>
+
+      <Text style={styles.infoText}>
+        Your new password must be unique from those previously used.
+      </Text>
+
       <Formik
         initialValues={{ password: "", confirmPassword: "" }}
         validationSchema={PasswordResetSchema}
@@ -54,7 +59,7 @@ const ResetPasswordScreen: React.FC = () => {
           <>
             <TextInput
               placeholder="New Password"
-              style={styles.input}
+              style={styles.newPassInput}
               onChangeText={handleChange("password")}
               onBlur={handleBlur("password")}
               value={values.password}
@@ -66,7 +71,7 @@ const ResetPasswordScreen: React.FC = () => {
 
             <TextInput
               placeholder="Confirm Password"
-              style={styles.input}
+              style={styles.newPassInput}
               onChangeText={handleChange("confirmPassword")}
               onBlur={handleBlur("confirmPassword")}
               value={values.confirmPassword}
@@ -77,10 +82,10 @@ const ResetPasswordScreen: React.FC = () => {
             )}
 
             <TouchableOpacity
-              style={styles.button}
+              style={styles.resetPassButton}
               onPress={handleSubmit as any}
             >
-              <Text style={styles.buttonText}>Reset Password</Text>
+              <Text style={styles.resetPassButtonText}>Reset Password</Text>
             </TouchableOpacity>
           </>
         )}
@@ -90,25 +95,28 @@ const ResetPasswordScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  resetPassContainer: {
     flex: 1,
     justifyContent: "center",
     padding: 20,
-    backgroundColor: "#F8F9FA",
   },
-  title: {
+  newPassText: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
-    textAlign: "center",
   },
-  input: {
+  infoText: {
+    marginTop: 2,
+    fontSize: 14,
+    color: "#6C757D",
+    marginBottom: 25,
+  },
+  newPassInput: {
+    borderColor: "#AE81D9",
     borderWidth: 1,
-    borderColor: "#CCC",
+    borderRadius: 7,
+    marginBottom: 9,
     padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-    backgroundColor: "#FFF",
   },
   errorText: {
     color: "red",
@@ -116,14 +124,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: "left",
   },
-  button: {
-    backgroundColor: "#6200EE",
+  resetPassButton: {
+    backgroundColor: "#7A4791",
     padding: 15,
     borderRadius: 5,
     alignItems: "center",
+    marginTop: 20,
+    marginBottom: 370,
   },
-  buttonText: {
-    color: "#FFF",
+  resetPassButtonText: {
+    color: "#FFFFFF",
     fontWeight: "bold",
     fontSize: 16,
   },

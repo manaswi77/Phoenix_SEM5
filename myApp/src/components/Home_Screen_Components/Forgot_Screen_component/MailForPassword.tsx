@@ -21,7 +21,7 @@ const ForgotPasswordSchema = Yup.object().shape({
     .required("Email is required"),
 });
 
-const MailPassWord = () => {
+const MailForPassWord = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   const handleForgotPassword = (values: { email: string }) => {
@@ -30,8 +30,13 @@ const MailPassWord = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Forgot Password</Text>
+    <View style={styles.mailContainer}>
+      <Text style={styles.forgotPassText}>Forgot Password ?</Text>
+
+      <Text style={styles.infoText}>
+        Don't worry! It happens. Please enter the email address linked with your
+        account.
+      </Text>
 
       <Formik
         initialValues={{ email: "" }}
@@ -49,7 +54,7 @@ const MailPassWord = () => {
           <>
             <TextInput
               placeholder="Enter your email"
-              style={styles.input}
+              style={styles.enterEmailInput}
               onChangeText={handleChange("email")}
               onBlur={handleBlur("email")}
               value={values.email}
@@ -61,43 +66,35 @@ const MailPassWord = () => {
             ) : null}
 
             <TouchableOpacity
-              style={styles.button}
+              style={styles.sendCodebutton}
               onPress={handleSubmit as any}
             >
-              <Text style={styles.buttonText}>Reset Password</Text>
+              <Text style={styles.sendCodeButtonText}>Send Code</Text>
             </TouchableOpacity>
           </>
         )}
       </Formik>
-
-      <Text style={styles.infoText}>
-        Enter the email associated with your account and we’ll send an email
-        with a link to reset your password.
-      </Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  mailContainer: {
     flex: 1,
     justifyContent: "center",
     padding: 20,
-    backgroundColor: "#F8F9FA",
   },
-  title: {
+  forgotPassText: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
+    marginBottom: 7,
   },
-  input: {
+  enterEmailInput: {
+    borderColor: "#AE81D9",
     borderWidth: 1,
-    borderColor: "#CCC",
+    borderRadius: 7,
+    marginBottom: 9,
     padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-    backgroundColor: "#FFF",
   },
   errorText: {
     color: "red",
@@ -105,23 +102,25 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: "left",
   },
-  button: {
-    backgroundColor: "#6200EE",
-    padding: 15,
+  sendCodebutton: {
+    marginTop: 15,
+    backgroundColor: "#7A4791",
+    padding: 14,
     borderRadius: 5,
     alignItems: "center",
+    marginBottom: 350,
   },
-  buttonText: {
-    color: "#FFF",
+  sendCodeButtonText: {
+    color: "#FFFFFF",
     fontWeight: "bold",
     fontSize: 16,
   },
   infoText: {
-    marginTop: 20,
+    marginTop: 2,
     fontSize: 14,
-    textAlign: "center",
     color: "#6C757D",
+    marginBottom: 20,
   },
 });
 
-export default MailPassWord;
+export default MailForPassWord;
