@@ -4,7 +4,7 @@ import React from 'react'
 const Post = () => {
   return (
     <View>
-      <Text>Post Page</Text>
+      <Text>Post Screen</Text>
     </View>
   )
 }
