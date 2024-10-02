@@ -12,6 +12,12 @@ export type ScreenState =
 
 export type ForgotPasswordStage = "mail" | "otp" | "changed" | "successful";
 
+export type SecurityScreenType =
+  | "features"
+  | "sosBtn"
+  | "safetyTimer"
+  | "incidentReporting";
+
 export interface User {
   id: number;
   name: string;

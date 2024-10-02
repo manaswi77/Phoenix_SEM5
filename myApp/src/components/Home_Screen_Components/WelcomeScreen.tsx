@@ -27,7 +27,7 @@ const WelcomeScreen: React.FC = () => {
         style={styles.image}
       />
       <Text>
-        Hi There! I'm Shreeyash Dongarkar. I like cats. and I hate Dr. Strange.
+        Hi There! 
       </Text>
       <View style={styles.welcomeScreenButtonContainer}>
         <TouchableOpacity
