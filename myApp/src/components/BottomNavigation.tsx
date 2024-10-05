@@ -1,9 +1,12 @@
 import React from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { setCurrentScreen } from "../contexts/screenSlice";
 import { RootState, AppDispatch } from "../store/store";
 import { ScreenState } from "../types/types";
+import SecurityIcon from "../../assets/SecurityIcon";
+import ChatbotIcon from "../../assets/ChatbotIcon";
+import HomeIcon from "../../assets/HomeIcon";
 
 const BottomNavigation: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -21,30 +24,41 @@ const BottomNavigation: React.FC = () => {
         style={styles.navButton}
         onPress={() => handlePress("chatbot")}
       >
+        <View>
+          <ChatbotIcon />
+        </View>
         <Text style={styles.navText}>Chatbot</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.navButton}
         onPress={() => handlePress("security")}
       >
+        <View>
+          <SecurityIcon />
+        </View>
         <Text style={styles.navText}>Security</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.navButton}
         onPress={() => handlePress("info")}
       >
+        <View>
+          <HomeIcon />
+        </View>
         <Text style={styles.navText}>Home</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.navButton}
         onPress={() => handlePress("community")}
       >
+        <View></View>
         <Text style={styles.navText}>Community</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.navButton}
         onPress={() => handlePress("settings")}
       >
+        <View></View>
         <Text style={styles.navText}>Settings</Text>
       </TouchableOpacity>
     </View>
