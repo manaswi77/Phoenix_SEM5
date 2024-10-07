@@ -30,7 +30,8 @@ const BottomNavigation: React.FC = () => {
       >
         <View>
           <ChatbotIcon
-            color={currentScreen === "chatbot" ? "#ffffff" : "#000000"}
+            // color={currentScreen === "chatbot" ? "#ffffff" : "#000000"}
+            size={currentScreen === "chatbot" ? 32 : 26}
           />
         </View>
         <Text
@@ -51,7 +52,8 @@ const BottomNavigation: React.FC = () => {
       >
         <View>
           <SecurityIcon
-            color={currentScreen === "security" ? "#ffffff" : "#000000"}
+            // color={currentScreen === "security" ? "#ffffff" : "#000000"}
+            size={currentScreen === "security" ? 32 : 26}
           />
         </View>
         <Text
@@ -69,7 +71,10 @@ const BottomNavigation: React.FC = () => {
         onPress={() => handlePress("info")}
       >
         <View>
-          <HomeIcon color={currentScreen === "info" ? "#ffffff" : "#000000"} />
+          <HomeIcon
+            // color={currentScreen === "info" ? "#ffffff" : "#000000"}
+            size={currentScreen === "info" ? 32 : 26}
+          />
         </View>
         <Text
           style={
@@ -89,7 +94,8 @@ const BottomNavigation: React.FC = () => {
       >
         <View>
           <CommunityIcon
-            color={currentScreen === "community" ? "#ffffff" : "#000000"}
+            // color={currentScreen === "community" ? "#ffffff" : "#000000"}
+            size={currentScreen === "community" ? 32 : 26}
           />
         </View>
         <Text
@@ -110,7 +116,8 @@ const BottomNavigation: React.FC = () => {
       >
         <View>
           <SettingsIcon
-            color={currentScreen === "settings" ? "#ffffff" : "#000000"}
+            // color={currentScreen === "settings" ? "#ffffff" : "#000000"}
+            size={currentScreen === "settings" ? 32 : 26}
           />
         </View>
         <Text
@@ -134,7 +141,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     backgroundColor: "#fff",
     paddingVertical: 10,
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
   },
   navButton: {
     alignItems: "center",
@@ -144,10 +151,10 @@ const styles = StyleSheet.create({
   },
   selectedButton: {
     alignItems: "center",
-    padding: 10,
+    padding: 12,
     backgroundColor: "#f8e6fc",
-    borderRadius: 5,
-    width: 80,
+    borderRadius: 15,
+    width: 85,
     height: 60,
   },
   navText: {
@@ -155,17 +162,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
     color: "#000000",
   },
-  selectedText: { fontSize: 11, marginTop: 5, color: "#000000" },
-  // sideButton: {
-  //   position: "absolute",
-  //   bottom: 0,
-  //   width: "100%",
-  //   flexDirection: "row",
-  //   justifyContent: "space-around",
-  //   backgroundColor: "#fff",
-  //   paddingVertical: 10,
-  //   paddingHorizontal: 10,
-  // },
+  selectedText: { display: "none" },
 });
 
 export default BottomNavigation;
