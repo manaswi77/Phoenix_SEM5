@@ -23,49 +23,103 @@ const BottomNavigation: React.FC = () => {
   return (
     <View style={styles.navContainer}>
       <TouchableOpacity
-        style={styles.navButton}
+        style={
+          currentScreen === "chatbot" ? styles.selectedButton : styles.navButton
+        }
         onPress={() => handlePress("chatbot")}
       >
         <View>
-          <ChatbotIcon />
+          <ChatbotIcon
+            color={currentScreen === "chatbot" ? "#ffffff" : "#000000"}
+          />
         </View>
-        <Text style={styles.navText}>Chatbot</Text>
+        <Text
+          style={
+            currentScreen === "chatbot" ? styles.selectedText : styles.navText
+          }
+        >
+          Chatbot
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={styles.navButton}
+        style={
+          currentScreen === "security"
+            ? styles.selectedButton
+            : styles.navButton
+        }
         onPress={() => handlePress("security")}
       >
         <View>
-          <SecurityIcon />
+          <SecurityIcon
+            color={currentScreen === "security" ? "#ffffff" : "#000000"}
+          />
         </View>
-        <Text style={styles.navText}>Security</Text>
+        <Text
+          style={
+            currentScreen === "security" ? styles.selectedText : styles.navText
+          }
+        >
+          Security
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={styles.navButton}
+        style={
+          currentScreen === "info" ? styles.selectedButton : styles.navButton
+        }
         onPress={() => handlePress("info")}
       >
         <View>
-          <HomeIcon />
+          <HomeIcon color={currentScreen === "info" ? "#ffffff" : "#000000"} />
         </View>
-        <Text style={styles.navText}>Home</Text>
+        <Text
+          style={
+            currentScreen === "info" ? styles.selectedText : styles.navText
+          }
+        >
+          Home
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={styles.navButton}
+        style={
+          currentScreen === "community"
+            ? styles.selectedButton
+            : styles.navButton
+        }
         onPress={() => handlePress("community")}
       >
         <View>
-          <CommunityIcon />
+          <CommunityIcon
+            color={currentScreen === "community" ? "#ffffff" : "#000000"}
+          />
         </View>
-        <Text style={styles.navText}>Community</Text>
+        <Text
+          style={
+            currentScreen === "community" ? styles.selectedText : styles.navText
+          }
+        >
+          Community
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={styles.navButton}
+        style={
+          currentScreen === "settings"
+            ? styles.selectedButton
+            : styles.navButton
+        }
         onPress={() => handlePress("settings")}
       >
         <View>
-          <SettingsIcon />
+          <SettingsIcon
+            color={currentScreen === "settings" ? "#ffffff" : "#000000"}
+          />
         </View>
-        <Text style={styles.navText}>Settings</Text>
+        <Text
+          style={
+            currentScreen === "settings" ? styles.selectedText : styles.navText
+          }
+        >
+          Settings
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -77,30 +131,41 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: "100%",
     flexDirection: "row",
-    flexWrap: "wrap",
     justifyContent: "space-around",
     backgroundColor: "#fff",
     paddingVertical: 10,
-  },
-  navigationIcon: {
-    height: 30,
-    width: 30,
-    borderWidth: 1,
-    backgroundColor: "red",
+    paddingHorizontal: 10,
   },
   navButton: {
     alignItems: "center",
     padding: 10,
+    width: 85,
+    height: 60,
   },
-  navIcon: {
-    width: 25,
-    height: 25,
-    borderWidth: 4,
+  selectedButton: {
+    alignItems: "center",
+    padding: 10,
+    backgroundColor: "#f8e6fc",
+    borderRadius: 5,
+    width: 80,
+    height: 60,
   },
   navText: {
+    fontSize: 11,
     marginTop: 5,
-    color: "#000",
+    color: "#000000",
   },
+  selectedText: { fontSize: 11, marginTop: 5, color: "#000000" },
+  // sideButton: {
+  //   position: "absolute",
+  //   bottom: 0,
+  //   width: "100%",
+  //   flexDirection: "row",
+  //   justifyContent: "space-around",
+  //   backgroundColor: "#fff",
+  //   paddingVertical: 10,
+  //   paddingHorizontal: 10,
+  // },
 });
 
 export default BottomNavigation;

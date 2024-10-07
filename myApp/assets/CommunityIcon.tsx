@@ -4,6 +4,7 @@ import Svg, { Path } from "react-native-svg";
 interface CustomIconProps {
   size?: number;
   fill?: string;
+  color?: string;
 }
 
 const CustomIcon: React.FC<CustomIconProps> = ({
