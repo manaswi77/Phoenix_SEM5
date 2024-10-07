@@ -7,6 +7,8 @@ import { ScreenState } from "../types/types";
 import SecurityIcon from "../../assets/SecurityIcon";
 import ChatbotIcon from "../../assets/ChatbotIcon";
 import HomeIcon from "../../assets/HomeIcon";
+import CommunityIcon from "../../assets/CommunityIcon";
+import SettingsIcon from "../../assets/SettingsIcon";
 
 const BottomNavigation: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -51,14 +53,18 @@ const BottomNavigation: React.FC = () => {
         style={styles.navButton}
         onPress={() => handlePress("community")}
       >
-        <View></View>
+        <View>
+          <CommunityIcon />
+        </View>
         <Text style={styles.navText}>Community</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.navButton}
         onPress={() => handlePress("settings")}
       >
-        <View></View>
+        <View>
+          <SettingsIcon />
+        </View>
         <Text style={styles.navText}>Settings</Text>
       </TouchableOpacity>
     </View>
