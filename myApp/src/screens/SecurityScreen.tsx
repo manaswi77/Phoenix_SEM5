@@ -43,7 +43,18 @@ const SecurityScreen: React.FC = () => {
     }
   };
 
-  return <View>{renderScreen()}</View>;
+  return <View style={styles.securityContainer}>{renderScreen()}</View>;
 };
 
 export default SecurityScreen;
+
+const styles = StyleSheet.create({
+  securityContainer: {
+    flex: 1,
+    padding: 20,
+    justifyContent: "space-between",
+    flexDirection: "column",
+    alignItems: "center",
+    height: "100%",
+  },
+});

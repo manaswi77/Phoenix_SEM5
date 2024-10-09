@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import React from "react";
 import { AppDispatch } from "../../store/store";
 import { useDispatch } from "react-redux";
-import { setCurrentFeature } from "../../contexts/securitySlice";
+import { setCurrentFeature } from "../../contexts/securityFeatureSlice";
 import { SecurityScreenType } from "../../types/types";
 
 const FeaturesScreen = () => {
