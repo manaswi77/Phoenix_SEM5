@@ -9,7 +9,7 @@ export const store = configureStore({
     screen: screenReducer,
     communityPosts: communityPostReducer,
     changePassword: changePasswordReducer,
-    security: securityScreenReducer,
+    securityFeature: securityScreenReducer,
   },
 });
 

@@ -9,20 +9,34 @@ import {
   TextInput,
   ScrollView,
 } from "react-native";
-import React, { useEffect, useState } from "react";
-import { AppDispatch } from "../../store/store";
-import { useDispatch } from "react-redux";
-import { setCurrentFeature } from "../../contexts/securityFeatureSlice";
+import React, { useEffect } from "react";
+import { AppDispatch, RootState } from "../../store/store";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setCurrentFeature,
+  setSafetyTimerState,
+  updateSafetyTimerTimeInterval,
+  addSafetyTimerContact,
+} from "../../contexts/securityFeatureSlice";
 import { Picker } from "@react-native-picker/picker";
 
 const SecurityTimerScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-  const [hours, setHours] = useState<number>(0);
-  const [minutes, setMinutes] = useState<number>(15);
-  const [isSafetyTimerEnabled, setIsSafetyTimerEnabled] =
-    useState<boolean>(false);
-  const [contactNumbers, setContactNumbers] = useState<string[]>([""]); // State to hold contact numbers
+  const safetyTimerInterval = useSelector(
+    (state: RootState) => state.securityFeature.safetyTimerTimeInterval
+  );
+
+  const isSafetyTimerEnabled = useSelector(
+    (state: RootState) => state.securityFeature.isSafetyTimerEnabled
+  );
+
+  const safetyTimerContacts = useSelector(
+    (state: RootState) => state.securityFeature.safetyTimerContacts
+  );
+
+  const [hours, setHours] = React.useState<number>(safetyTimerInterval[0]);
+  const [minutes, setMinutes] = React.useState<number>(safetyTimerInterval[1]);
 
   useEffect(() => {
     const backAction = () => {
@@ -52,34 +66,42 @@ const SecurityTimerScreen: React.FC = () => {
       return;
     }
     if (validateTime()) {
-      // Save timer and contact info logic here
+      dispatch(updateSafetyTimerTimeInterval([hours, minutes]));
+
       Alert.alert(
         "Settings Saved",
-        `Timer set for ${hours} hours and ${minutes} minutes. Contacts: ${contactNumbers.join(", ")}`
+        `Timer set for ${hours} hours and ${minutes} minutes. Contacts: ${safetyTimerContacts.join(", ")}`
       );
     }
   };
 
-  const addContactField = () => {
-    setContactNumbers([...contactNumbers, ""]); // Add a new empty contact field
+  const handleContactChange = (text: string, index: number) => {
+    const updatedContacts = [...safetyTimerContacts];
+    updatedContacts[index] = text;
+    dispatch(addSafetyTimerContact(updatedContacts[index]));
   };
 
-  const handleContactChange = (text: string, index: number) => {
-    const updatedContacts = [...contactNumbers];
-    updatedContacts[index] = text; // Update the specific contact field
-    setContactNumbers(updatedContacts);
+  const addContactField = () => {
+    const emptyIndex = safetyTimerContacts.indexOf("");
+    if (emptyIndex !== -1) {
+      const updatedContacts = [...safetyTimerContacts];
+      updatedContacts[emptyIndex] = "";
+      dispatch(addSafetyTimerContact(updatedContacts[emptyIndex]));
+    } else {
+      console.warn("All Safety Timer contacts are already filled.");
+    }
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.safetyTimerMainContainer} // Use contentContainerStyle
-    >
+    <ScrollView contentContainerStyle={styles.safetyTimerMainContainer}>
       <View style={styles.safetyTimerInfo}>
         <View style={styles.safetyTimerInfoTop}>
           <Text style={styles.title}>Enable Safety Timer</Text>
           <Switch
             value={isSafetyTimerEnabled}
-            onValueChange={(value) => setIsSafetyTimerEnabled(value)}
+            onValueChange={(value) => {
+              dispatch(setSafetyTimerState());
+            }}
           />
         </View>
         <View style={styles.safetyTimerInfoBottom}>
@@ -124,7 +146,7 @@ const SecurityTimerScreen: React.FC = () => {
         {/* Contact Input Fields */}
         <View style={styles.contactInputContainer}>
           <Text style={styles.title}>Enter Emergency Contacts</Text>
-          {contactNumbers.map((contact, index) => (
+          {safetyTimerContacts.map((contact, index) => (
             <TextInput
               key={index}
               style={styles.contactInput}
@@ -145,7 +167,7 @@ const SecurityTimerScreen: React.FC = () => {
         <TouchableOpacity
           style={styles.saveButton}
           onPress={handleSave}
-          disabled={!isSafetyTimerEnabled} // Disable save if the safety timer is off
+          disabled={!isSafetyTimerEnabled}
         >
           <Text style={styles.buttonText}>Save</Text>
         </TouchableOpacity>
@@ -158,7 +180,7 @@ export default SecurityTimerScreen;
 
 const styles = StyleSheet.create({
   safetyTimerMainContainer: {
-    flexGrow: 1, // Use flexGrow to allow the container to expand with content
+    flexGrow: 1,
     padding: 20,
   },
   title: {

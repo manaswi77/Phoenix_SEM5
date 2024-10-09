@@ -12,7 +12,7 @@ import { setCurrentScreen } from "../contexts/screenSlice";
 
 const SecurityScreen: React.FC = () => {
   const currentScreen = useSelector(
-    (state: RootState) => state.security.currentFeature
+    (state: RootState) => state.securityFeature.currentFeature
   );
 
   const dispatch = useDispatch<AppDispatch>();
