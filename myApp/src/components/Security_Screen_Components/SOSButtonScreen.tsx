@@ -25,7 +25,7 @@ const SOSButtonScreen = () => {
     return () => backHandler.remove();
   }, [dispatch]);
   return (
-    <View>
+    <View style={styles.SOSButtonMainContainer}>
       <Text>SOSButtonScreen</Text>
     </View>
   );
@@ -33,4 +33,6 @@ const SOSButtonScreen = () => {
 
 export default SOSButtonScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  SOSButtonMainContainer: {},
+});
