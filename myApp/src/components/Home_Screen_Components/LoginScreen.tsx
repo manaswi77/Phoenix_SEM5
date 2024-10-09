@@ -11,6 +11,7 @@ import * as Yup from "yup";
 import { useDispatch } from "react-redux";
 import { setIsLoggedIn, setCurrentScreen } from "../../contexts/screenSlice";
 import { AppDispatch } from "../../store/store";
+import React from "react";
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
