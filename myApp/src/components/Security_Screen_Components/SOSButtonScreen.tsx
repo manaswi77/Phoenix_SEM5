@@ -1,15 +1,11 @@
-import { StyleSheet, Text, View, BackHandler } from "react-native";
+import { StyleSheet, Text, View, BackHandler, ScrollView, TouchableOpacity } from "react-native";
 import React, { useEffect } from "react";
 import { AppDispatch, RootState } from "../../store/store";
 import { useDispatch, useSelector } from "react-redux";
-import { setCurrentFeature } from "../../contexts/securityFeatureSlice";
+import { setCurrentFeature, setSOSButtonState, addSOSButtonContact } from "../../contexts/securityFeatureSlice";
 
 const SOSButtonScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
-
-  const isSOSButtonEnabled = useSelector(
-    (state: RootState) => state.securityFeature.isSOSButtonEnabled
-  );
 
   useEffect(() => {
     const backAction = () => {
@@ -24,10 +20,44 @@ const SOSButtonScreen = () => {
 
     return () => backHandler.remove();
   }, [dispatch]);
+
+  const safetyTimerContacts = useSelector(
+    (state: RootState) => state.securityFeature.safetyTimerContacts
+  );
+
+  const addContact = () => {
+
+  }
+
+  const handleSave = () => {}
+
   return (
-    <View style={styles.SOSButtonMainContainer}>
-      <Text>SOSButtonScreen</Text>
-    </View>
+    <ScrollView>
+   
+      <View style={styles.SOSButtonMainContainer}>
+        <Text>In this feature, we provide users with immediate 
+          access to emergency assistance. With a single tap, users 
+          can alert designated contacts or emergency services, sending 
+          their location and a distress message. A message will go to 
+          the nearby police station and nirbhaya pathak automatically. </Text>
+      </View>
+
+      <View style={styles.SOSContacts}>
+        <TouchableOpacity
+          style={styles.addContactButton}
+          onPress={addContact}
+        >
+          <Text>Add Emergency Contacts</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.saveButton}
+          onPress={handleSave}
+        >
+          <Text style={styles.saveButtonText}>Save</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
@@ -35,4 +65,8 @@ export default SOSButtonScreen;
 
 const styles = StyleSheet.create({
   SOSButtonMainContainer: {},
+  SOSContacts : {},
+  addContactButton: {},
+  saveButton: {},
+  saveButtonText: {},
 });
