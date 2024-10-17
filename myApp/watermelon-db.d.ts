@@ -37,6 +37,7 @@ declare module "@nozbe/watermelondb/Database" {
 
   export default class Database {
     adapter: DatabaseAdapter;
+      action: any;
     constructor(options: {
       adapter: DatabaseAdapter;
       modelClasses: Array<typeof Model>;

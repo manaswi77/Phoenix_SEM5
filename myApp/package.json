@@ -18,6 +18,7 @@
     "@react-navigation/stack": "^6.4.1",
     "@reduxjs/toolkit": "^2.2.7",
     "axios": "^1.7.7",
+    "bcryptjs": "^2.4.3",
     "expo": "~51.0.28",
     "expo-contacts": "^13.0.5",
     "expo-font": "^12.0.10",
@@ -36,8 +37,8 @@
     "react-native-vector-icons": "^10.1.0",
     "react-redux": "^9.1.2",
     "redux": "^5.0.1",
-    "yup": "^1.4.0",
-    "undefined": "@nozbe/watermelondb/adapters/sqlite"
+    "undefined": "@nozbe/watermelondb/adapters/sqlite",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
