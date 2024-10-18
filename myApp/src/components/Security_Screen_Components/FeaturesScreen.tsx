@@ -16,28 +16,42 @@ const FeaturesScreen = () => {
     <View style={styles.featureScreenContainer}>
       <View style={styles.featureContainer}>
         <TouchableOpacity onPress={() => handlePress("sosBtn")}>
-          <Text>SOS Button</Text>
+          <Text style={styles.featureBtn}>SOS Button</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.featureContainer}>
         <TouchableOpacity onPress={() => handlePress("incidentReporting")}>
-          <Text>Incident Reporting</Text>
+          <Text style={styles.featureBtn}>Incident Reporting</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.featureContainer}>
-        <TouchableOpacity>
-          <Text onPress={() => handlePress("safetyTimer")}>Safety Timer</Text>
+        <TouchableOpacity onPress={() => handlePress("safetyTimer")}>
+          <Text style={styles.featureBtn}>Safety Timer</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 };
-
+     
 export default FeaturesScreen;
 
 const styles = StyleSheet.create({
-  featureScreenContainer: {},
-  featureContainer: {},
-  SOSBtn: {},
-  safetyTimerBtn: {},
+  featureScreenContainer: {
+    alignContent:  "center",
+    justifyContent: "center",
+    flex: 1,
+  },
+  featureContainer: {
+    margin: 10,
+    padding: 45,
+    // backgroundColor:  "#642ca9", 861388
+    // backgroundColor: "#242038",
+    backgroundColor: "#9067c6",
+    borderRadius: 10,
+  },
+  featureBtn: {
+    fontSize:  20,
+    textAlign: "center", 
+    color: "#fff"
+  },
 });
