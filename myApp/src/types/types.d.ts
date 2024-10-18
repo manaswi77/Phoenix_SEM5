@@ -58,3 +58,11 @@ export interface CommentResponse {
   postId: string;
   comment: Comment;
 }
+
+export interface SecurityScreenData {
+  isSOSButtonEnabled: number;
+  isSafetyTimerEnabled: number;
+  safetyTimerTimeInterval: string;
+  sosButtonContacts: string;
+  safetyTimerContacts: string;
+}

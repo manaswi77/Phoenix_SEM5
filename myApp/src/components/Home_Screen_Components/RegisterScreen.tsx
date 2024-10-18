@@ -12,6 +12,7 @@ import * as Yup from "yup";
 import { useDispatch } from "react-redux";
 import { setIsLoggedIn, setCurrentScreen } from "../../contexts/screenSlice";
 import { AppDispatch } from "../../store/store";
+import { registerUser } from "../../services/firebase/auth.services";
 
 const RegisterSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
@@ -24,14 +25,26 @@ const RegisterSchema = Yup.object().shape({
 const RegisterScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-  // TODO:  Add firebase API Calls to register
-  const handleSubmit = (values: {
+  const handleSubmit = async (values: {
     email: string;
     password: string;
     confirmPassword: string;
+    username: string;
   }) => {
-    dispatch(setIsLoggedIn(true));
-    dispatch(setCurrentScreen("info"));
+    try {
+      const user = await registerUser(
+        values.email,
+        values.password,
+        values.username
+      );
+
+      dispatch(setIsLoggedIn(true));
+      dispatch(setCurrentScreen("info"));
+
+      console.log("User registered successfully:", user);
+    } catch (error) {
+      console.error("Registration error:", error);
+    }
   };
 
   return (
