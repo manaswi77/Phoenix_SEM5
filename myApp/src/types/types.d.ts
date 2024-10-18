@@ -18,6 +18,11 @@ export type SecurityScreenType =
   | "safetyTimer"
   | "incidentReporting";
 
+export interface UserSession {
+  isLoggedIn: boolean;
+  token: string;
+}
+
 export interface User {
   id: number;
   name: string;
