@@ -93,7 +93,9 @@ const SecurityTimerScreen: React.FC = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.safetyTimerMainContainer}>
+    <ScrollView contentContainerStyle={styles.safetyTimerMainContainer}
+    showsVerticalScrollIndicator={false}>
+      
       <View style={styles.safetyTimerInfo}>
         <View style={styles.safetyTimerInfoTop}>
           <Text style={styles.title}>Enable Safety Timer</Text>
@@ -178,68 +180,105 @@ const SecurityTimerScreen: React.FC = () => {
 
 export default SecurityTimerScreen;
 
+
 const styles = StyleSheet.create({
   safetyTimerMainContainer: {
     flexGrow: 1,
     padding: 20,
+    backgroundColor: "#f2d7f7", 
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 3,
+    paddingBottom: 80,
   },
   title: {
     fontSize: 24,
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 20,
   },
   pickerContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
   },
   picker: {
     height: 50,
     width: 100,
+    backgroundColor: "#e9ecef",
+    borderRadius: 5,
+    marginHorizontal: 10,
   },
   colon: {
     fontSize: 20,
     marginHorizontal: 5,
+    color: "#495057",
   },
   contactInputContainer: {
     width: "100%",
     marginBottom: 20,
   },
   contactInput: {
-    height: 40,
-    borderColor: "gray",
+    height: 50,
+    borderColor: "#7A4791", // Matching border color
     borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 10,
-    paddingHorizontal: 10,
+    borderRadius: 8,
+    marginBottom: 15,
+    paddingHorizontal: 15,
+    backgroundColor: "#fff",
+    color: "#7A4791",
+    // fontFamily: "Poppins_400Regular",
   },
   addContactButton: {
     marginTop: 10,
-    padding: 10,
-    backgroundColor: "#28a745",
-    borderRadius: 5,
+    padding: 14,
+    backgroundColor: "#9067c6", // Consistent button color
+    borderRadius: 10,
+    alignItems: "center",
   },
   saveButton: {
     marginTop: 20,
-    padding: 10,
-    backgroundColor: "#007bff",
-    borderRadius: 5,
+    padding: 14,
+    backgroundColor: "#9067c6",
+    borderRadius: 10,
+    alignItems: "center",
   },
   buttonText: {
     color: "#fff",
     fontSize: 16,
-    textAlign: "center",
+    fontWeight: "bold",
+    // fontFamily: "Poppins_700Bold",
   },
   safetyTimerInfo: {
     marginBottom: 20,
+    padding: 15,
+    backgroundColor: "#f2d7f7",
+    borderRadius: 5,
   },
   safetyTimerSettings: {
     width: "100%",
+    padding: 15,
+    backgroundColor: "#f2d7f7",
+    borderRadius: 5,
   },
   safetyTimerSetContainer: {
     marginBottom: 20,
+    alignItems: "center",
   },
   disabledSection: {
     opacity: 0.5,
   },
-  safetyTimerInfoTop: {},
-  safetyTimerInfoBottom: {},
+  safetyTimerInfoTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  safetyTimerInfoBottom: {
+    marginTop: 10,
+    // fontFamily: "Poppins_400Regular",
+  },
 });

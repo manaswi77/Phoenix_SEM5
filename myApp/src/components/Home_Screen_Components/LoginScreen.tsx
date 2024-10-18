@@ -137,18 +137,18 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   loginMailInput: {
-    borderColor: "#AE81D9",
+    borderColor: "#9067c6",
     borderWidth: 1,
     borderRadius: 7,
     marginBottom: 9,
     padding: 10,
   },
   registerNowText: {
-    color: "#7A4791",
+    color: "#9067c6",
     fontWeight: "bold",
   },
   loginPasswordInput: {
-    borderColor: "#AE81D9",
+    borderColor: "#9067c6",
     borderWidth: 1,
     borderRadius: 7,
     marginBottom: 9,
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
   },
   loginButton: {
-    backgroundColor: "#7A4791",
+    backgroundColor: "#9067c6",
     borderRadius: 5,
     padding: 14,
     color: "#FFFFFF",

@@ -166,11 +166,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   accExistsText: {
-    color: "#7A4791",
+    color: "#9067c6",
     fontWeight: "bold",
   },
   goToLoginBtn: {
-    backgroundColor: "#7A4791",
+    backgroundColor: "#9067c6",
   },
   input: {
     height: 40,
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
   },
   registrationInput: {
-    borderColor: "#AE81D9",
+    borderColor: "#9067c6",
     borderWidth: 1,
     borderRadius: 7,
     marginBottom: 12,
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   registerButton: {
     marginTop: 17,
     marginBottom: 5,
-    backgroundColor: "#7A4791",
+    backgroundColor: "#9067c6",
     padding: 16,
     borderRadius: 5,
     fontWeight: "bold",
