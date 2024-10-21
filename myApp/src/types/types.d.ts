@@ -19,6 +19,11 @@ export type SecurityScreenType =
   | "safetyTimer"
   | "incidentReporting";
 
+export interface UserSession {
+  isLoggedIn: boolean;
+  token: string;
+}
+
 export interface User {
   id: number;
   name: string;
@@ -53,4 +58,12 @@ export interface LikeResponse {
 export interface CommentResponse {
   postId: string;
   comment: Comment;
+}
+
+export interface SecurityScreenData {
+  isSOSButtonEnabled: number;
+  isSafetyTimerEnabled: number;
+  safetyTimerTimeInterval: string;
+  sosButtonContacts: string;
+  safetyTimerContacts: string;
 }

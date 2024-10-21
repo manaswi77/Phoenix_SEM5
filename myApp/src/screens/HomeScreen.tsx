@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, StyleSheet } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 import WelcomeScreen from "../components/Home_Screen_Components/WelcomeScreen";
 import LoginScreen from "../components/Home_Screen_Components/LoginScreen";
 import RegisterScreen from "../components/Home_Screen_Components/RegisterScreen";
@@ -10,17 +11,33 @@ import CommunityScreen from "./CommunityScreen";
 import SettingsScreen from "./SettingsScreen";
 import SecurityScreen from "./SecurityScreen";
 import ForgotPasswordScreen from "./ForgotPasswordScreen";
-import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 // import Home from "../components/Home_Screen_Components/Home_screen";
 import OnboardingScreen from "../components/Splash_Screen_Components/OnboardingScreen";
 
+import { AppDispatch } from "../store/store";
+import { setIsLoggedIn, setCurrentScreen } from "../contexts/screenSlice";
+import { checkUserSession as checkUserSessionService } from "../services/database/UserSession.services";
 
 const HomeScreen: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+
   const isLoggedIn = useSelector((state: RootState) => state.screen.isLoggedIn);
   const currentScreen = useSelector(
     (state: RootState) => state.screen.currentScreen
   );
+
+  useEffect(() => {
+    const fetchUserSession = async () => {
+      const isLoggedIn = await checkUserSessionService();
+      if (isLoggedIn) {
+        dispatch(setIsLoggedIn(true));
+        dispatch(setCurrentScreen("info"));
+      }
+    };
+
+    fetchUserSession();
+  }, []);
 
   const renderScreen = () => {
     switch (currentScreen) {
@@ -62,7 +79,9 @@ const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: "#f8e6fc",
+    // backgroundColor: "#f8e6fc", 
+    // backgroundColor: "#fcf6f2",
+    backgroundColor: "#f0eff4",
     paddingTop: 30,
     paddingBottom: 5,
   },

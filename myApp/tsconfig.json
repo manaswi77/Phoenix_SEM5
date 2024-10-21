@@ -13,7 +13,9 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "lib": ["ES6"],
-    "noEmit": true
+    "noEmit": true,
+    "experimentalDecorators": true,
+    "typeRoots": ["./node_modules/@types", "watermelon-db.d.ts"]
   },
   "exclude": [
     "node_modules",

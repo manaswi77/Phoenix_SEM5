@@ -1,7 +1,10 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { Post } from "../types/types";
 import { LikeResponse, CommentResponse } from "../types/types";
-import { likePost, commentOnPost } from "../services/communityPostService";
+import {
+  likePost,
+  commentOnPost,
+} from "../services/firebase/communityScreen.services";
 
 // Define the state type
 interface CommunityPostStateType {

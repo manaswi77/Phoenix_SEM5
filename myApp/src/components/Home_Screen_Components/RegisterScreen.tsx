@@ -12,6 +12,7 @@ import * as Yup from "yup";
 import { useDispatch } from "react-redux";
 import { setIsLoggedIn, setCurrentScreen } from "../../contexts/screenSlice";
 import { AppDispatch } from "../../store/store";
+import { registerUser } from "../../services/firebase/auth.services";
 
 const RegisterSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
@@ -24,14 +25,26 @@ const RegisterSchema = Yup.object().shape({
 const RegisterScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-  // TODO:  Add firebase API Calls to register
-  const handleSubmit = (values: {
+  const handleSubmit = async (values: {
     email: string;
     password: string;
     confirmPassword: string;
+    username: string;
   }) => {
-    dispatch(setIsLoggedIn(true));
-    dispatch(setCurrentScreen("info"));
+    try {
+      const user = await registerUser(
+        values.email,
+        values.password,
+        values.username
+      );
+
+      dispatch(setIsLoggedIn(true));
+      dispatch(setCurrentScreen("info"));
+
+      console.log("User registered successfully:", user);
+    } catch (error) {
+      console.error("Registration error:", error);
+    }
   };
 
   return (
@@ -166,11 +179,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   accExistsText: {
-    color: "#7A4791",
+    color: "#9067c6",
     fontWeight: "bold",
   },
   goToLoginBtn: {
-    backgroundColor: "#7A4791",
+    backgroundColor: "#9067c6",
   },
   input: {
     height: 40,
@@ -180,7 +193,7 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
   },
   registrationInput: {
-    borderColor: "#AE81D9",
+    borderColor: "#9067c6",
     borderWidth: 1,
     borderRadius: 7,
     marginBottom: 12,
@@ -193,7 +206,7 @@ const styles = StyleSheet.create({
   registerButton: {
     marginTop: 17,
     marginBottom: 5,
-    backgroundColor: "#7A4791",
+    backgroundColor: "#9067c6",
     padding: 16,
     borderRadius: 5,
     fontWeight: "bold",

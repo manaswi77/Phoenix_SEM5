@@ -62,26 +62,28 @@ const IncidentReportingScreen = () => {
     <View style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
-        showsVerticalScrollIndicator={false} // Hides the scroll bar
+        showsVerticalScrollIndicator={false} 
       >
         <View style={styles.incidentReportingMainContainer}>
-          {/* Back Arrow Button */}
-          <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
-            <Ionicons name="arrow-back" size={24} color="black" />
-          </TouchableOpacity>
-
-          <View style={styles.incidentReportingInfo}>
-            {/* Header */}
-            <View style={styles.headerContainer}>
-              <Text style={styles.header}>Report an Incident</Text>
-            </View>
-            <Text style={styles.description}>
+        <Text style={styles.infoText}>
               Quickly seek help from government authorities or support
               organizations in cases of domestic abuse or other wrongful acts.
               This feature enables you to provide essential details, including
               images, location, and a description of the incident, to ensure
               timely and effective assistance.
             </Text>
+        </View>
+        <View style={styles.incidentReportingMainContainer}>
+          
+          {/* <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </TouchableOpacity> */}
+
+          <View style={styles.incidentReportingInfo}>
+            {/* <View style={styles.headerContainer}>
+              <Text style={styles.header}>Report an Incident</Text>
+            </View> */}
+            
           </View>
 
           <Formik
@@ -96,7 +98,6 @@ const IncidentReportingScreen = () => {
           >
             {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
               <>
-                {/* Image Upload Section */}
                 <TouchableOpacity
                   style={styles.uploadButton}
                   onPress={handleImageUpload}
@@ -109,7 +110,6 @@ const IncidentReportingScreen = () => {
                   <Image source={{ uri: image }} style={styles.imagePreview} />
                 )}
 
-                {/* Name Input */}
                 <TextInput
                   style={styles.input}
                   placeholder="Name"
@@ -121,7 +121,6 @@ const IncidentReportingScreen = () => {
                   <Text style={styles.errorText}>{errors.name}</Text>
                 )}
 
-                {/* Description Input */}
                 <TextInput
                   style={styles.inputMultiline}
                   placeholder="Description"
@@ -135,7 +134,6 @@ const IncidentReportingScreen = () => {
                   <Text style={styles.errorText}>{errors.description}</Text>
                 )}
 
-                {/* Location Input */}
                 <TextInput
                   style={styles.input}
                   placeholder="Location"
@@ -146,8 +144,7 @@ const IncidentReportingScreen = () => {
                 {errors.location && (
                   <Text style={styles.errorText}>{errors.location}</Text>
                 )}
-
-                {/* Contact Number Input */}
+                
                 <TextInput
                   style={styles.input}
                   placeholder="Contact Number"
@@ -160,7 +157,6 @@ const IncidentReportingScreen = () => {
                   <Text style={styles.errorText}>{errors.contact}</Text>
                 )}
 
-                {/* Submit Button */}
                 <TouchableOpacity
                   style={styles.submitButton}
                   onPress={() => handleSubmit()}
@@ -181,7 +177,7 @@ export default IncidentReportingScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f7f7f7",
+    borderRadius: 10,
   },
   scrollContainer: {
     paddingBottom: 60,
@@ -189,6 +185,21 @@ const styles = StyleSheet.create({
   },
   incidentReportingMainContainer: {
     padding: 20,
+    backgroundColor: "#f2d7f7", // Updated to match SOSButtonScreen
+    borderRadius: 10,
+    margin: 10,
+    borderColor: "#ddd",
+    borderWidth: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  infoText: {
+    fontSize: 16,
+    color: "#333",
+    fontFamily: "roboto",
   },
   backButton: {
     position: "absolute",
@@ -206,17 +217,22 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
     marginLeft: 40,
+    fontFamily: "Poppins_700Bold", // Ensure font family matches across screens
   },
   description: {
     fontSize: 16,
-    color: "#555",
+    color: "#333", // Updated for consistency
     marginBottom: 20,
     lineHeight: 22,
+    backgroundColor: "#ed87ff",
+    padding: 10,
+    borderRadius: 10,
+    fontFamily: "Poppins_400Regular",
   },
   uploadButton: {
-    backgroundColor: "#007bff",
-    padding: 15,
-    borderRadius: 8,
+    backgroundColor: "#9067c6", // Matching button color
+    padding: 14,
+    borderRadius: 10,
     alignItems: "center",
     marginBottom: 20,
   },
@@ -224,6 +240,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+    fontFamily: "Poppins_700Bold",
   },
   imagePreview: {
     width: 120,
@@ -235,32 +252,36 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 50,
-    borderColor: "#ddd",
+    borderColor: "#7A4791", // Matching border color
     borderWidth: 1,
     borderRadius: 8,
     marginBottom: 15,
     paddingHorizontal: 15,
     backgroundColor: "#fff",
+    color: "#7A4791",
+    fontFamily: "Poppins_400Regular",
   },
   inputMultiline: {
     height: 100,
-    borderColor: "#ddd",
     borderWidth: 1,
     borderRadius: 8,
     marginBottom: 15,
     paddingHorizontal: 15,
     paddingTop: 10,
     backgroundColor: "#fff",
+    borderColor: "#7A4791", // Matching color
+    fontFamily: "Poppins_400Regular",
   },
   errorText: {
     fontSize: 12,
     color: "red",
     marginBottom: 10,
+    fontFamily: "Poppins_400Regular",
   },
   submitButton: {
-    backgroundColor: "#28a745",
-    padding: 15,
-    borderRadius: 8,
+    backgroundColor: "#9067c6", // Updated to match SOSButtonScreen
+    padding: 14,
+    borderRadius: 10,
     alignItems: "center",
     marginTop: 20,
   },
@@ -268,6 +289,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+    fontFamily: "Poppins_700Bold",
   },
   incidentReportingInfo: {
     marginBottom: 20,
