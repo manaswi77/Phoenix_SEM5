@@ -12,6 +12,9 @@ import SecurityScreen from "./SecurityScreen";
 import ForgotPasswordScreen from "./ForgotPasswordScreen";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
+// import Home from "../components/Home_Screen_Components/Home_screen";
+import OnboardingScreen from "../components/Splash_Screen_Components/OnboardingScreen";
+
 
 const HomeScreen: React.FC = () => {
   const isLoggedIn = useSelector((state: RootState) => state.screen.isLoggedIn);
@@ -21,6 +24,8 @@ const HomeScreen: React.FC = () => {
 
   const renderScreen = () => {
     switch (currentScreen) {
+      case "onboarding":
+        return <OnboardingScreen />;
       case "welcome":
         return <WelcomeScreen />;
       case "login":
@@ -29,6 +34,8 @@ const HomeScreen: React.FC = () => {
         return <RegisterScreen />;
       case "info":
         return <InfoScreen />;
+      // case "home":
+      //   return <Home />;
       case "chatbot":
         return <ChatbotScreen />;
       case "community":
@@ -39,8 +46,8 @@ const HomeScreen: React.FC = () => {
         return <SecurityScreen />;
       case "forgotPassword":
         return <ForgotPasswordScreen />;
-      default:
-        return null;
+      // default:
+      //   return <Home />;
     }
   };
 

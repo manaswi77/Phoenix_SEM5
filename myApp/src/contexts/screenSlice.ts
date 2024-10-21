@@ -8,7 +8,7 @@ interface ScreenStateType {
 
 const initialState: ScreenStateType = {
   isLoggedIn: false,
-  currentScreen: "welcome",
+  currentScreen: "onboarding",
 };
 
 const screenSlice = createSlice({
