@@ -8,6 +8,8 @@ node_modules/
 dist/
 web-build/
 
+
+
 # Native
 *.orig.*
 *.jks
@@ -15,6 +17,8 @@ web-build/
 *.p12
 *.key
 *.mobileprovision
+
+.env
 
 # Metro
 .metro-health-check*

@@ -1,59 +1,58 @@
-import database from "../../config/watermelon.config";
-import User from "../../database/models/User.model";
+import dbInstance from "../../config/sqlite.config";
+import { UserSession } from "../../types/types";
 
-type Token = string;
-
-export const createOrUpdateSession = async (token: Token): Promise<void> => {
-  await database.action(async () => {
-    const existingUser = await database
-      .get<User>("users")
-      .query((user: { isLoggedIn: { eq: (arg0: boolean) => any } }) =>
-        user.isLoggedIn.eq(true)
-      )
-      .fetch();
-
-    if (existingUser.length > 0) {
-      const user: User = existingUser[0];
-      await user.update((u) => {
-        u.token = token;
-      });
-    } else {
-      await database
-        .get<User>("users")
-        .create((u: { isLoggedIn: boolean; token: string }) => {
-          u.isLoggedIn = true;
-          u.token = token;
-        });
-    }
-  });
+const insertUser = async (isLoggedIn: boolean, token: string) => {
+  const result = await (
+    await dbInstance
+  ).runAsync(
+    "INSERT INTO users (isLoggedIn, token) VALUES (?, ?)",
+    isLoggedIn ? 1 : 0,
+    token
+  );
+  console.log(result.lastInsertRowId, result.changes);
 };
 
-export const deleteSession = async (): Promise<void> => {
-  await database.action(async () => {
-    const existingUser = await database
-      .get<User>("users")
-      .query((user: { isLoggedIn: { eq: (arg0: boolean) => any } }) =>
-        user.isLoggedIn.eq(true)
-      )
-      .fetch();
-
-    if (existingUser.length > 0) {
-      const user: User = existingUser[0];
-      await user.update((u) => {
-        u.isLoggedIn = false;
-        u.token = "";
-      });
-    }
-  });
+const updateUserSession = async (token: string) => {
+  await (
+    await dbInstance
+  ).runAsync("UPDATE users SET token = ? WHERE isLoggedIn = ?", token, 1);
 };
 
-export const checkSession = async (): Promise<boolean> => {
-  const existingUser = await database
-    .get<User>("users")
-    .query((user: { isLoggedIn: { eq: (arg0: boolean) => any } }) =>
-      user.isLoggedIn.eq(true)
-    )
-    .fetch();
+const deleteUserSession = async () => {
+  await (
+    await dbInstance
+  ).runAsync(
+    "UPDATE users SET isLoggedIn = ?, token = ? WHERE isLoggedIn = ?",
+    0,
+    "",
+    1
+  );
+};
 
-  return existingUser.length > 0;
+const checkUserSession = async (): Promise<boolean> => {
+  const firstRow = await (
+    await dbInstance
+  ).getFirstAsync("SELECT * FROM users WHERE isLoggedIn = 1");
+
+  return firstRow ? true : false;
+};
+
+const retrieveToken = async (): Promise<string | null> => {
+  const firstRow = await (
+    await dbInstance
+  ).getFirstAsync("SELECT token FROM users WHERE isLoggedIn = 1");
+
+  if (firstRow && (firstRow as UserSession).token) {
+    return (firstRow as UserSession).token;
+  }
+
+  return null;
+};
+
+export {
+  insertUser,
+  updateUserSession,
+  deleteUserSession,
+  checkUserSession,
+  retrieveToken,
 };
