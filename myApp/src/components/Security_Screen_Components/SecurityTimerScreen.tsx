@@ -8,8 +8,9 @@ import {
   Switch,
   TextInput,
   ScrollView,
+  Modal,
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { AppDispatch, RootState } from "../../store/store";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -19,6 +20,32 @@ import {
   addSafetyTimerContact,
 } from "../../contexts/securityFeatureSlice";
 import { Picker } from "@react-native-picker/picker";
+
+const SafetyConfirmationPopup = ({
+  visible,
+  onConfirm,
+  onCancel,
+}: {
+  visible: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) => (
+  <Modal transparent visible={visible} animationType="slide">
+    <View style={styles.overlay}>
+      <View style={styles.modalContainer}>
+        <Text style={styles.modalText}>Please confirm your safety</Text>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity onPress={onConfirm} style={styles.modalButton}>
+            <Text style={styles.buttonText}>I'm Safe</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onCancel} style={styles.modalButton}>
+            <Text style={styles.buttonText}>I'm Not Safe</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  </Modal>
+);
 
 const SecurityTimerScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -35,8 +62,9 @@ const SecurityTimerScreen: React.FC = () => {
     (state: RootState) => state.securityFeature.safetyTimerContacts
   );
 
-  const [hours, setHours] = React.useState<number>(safetyTimerInterval[0]);
-  const [minutes, setMinutes] = React.useState<number>(safetyTimerInterval[1]);
+  const [hours, setHours] = useState<number>(safetyTimerInterval[0]);
+  const [minutes, setMinutes] = useState<number>(safetyTimerInterval[1]);
+  const [popupVisible, setPopupVisible] = useState<boolean>(false);
 
   useEffect(() => {
     const backAction = () => {
@@ -70,7 +98,14 @@ const SecurityTimerScreen: React.FC = () => {
 
       Alert.alert(
         "Settings Saved",
-        `Timer set for ${hours} hours and ${minutes} minutes. Contacts: ${safetyTimerContacts.join(", ")}`
+        `Timer set for ${hours} hours and ${minutes} minutes.}`
+      );
+
+      setTimeout(
+        () => {
+          setPopupVisible(true); // Show popup when timer expires
+        },
+        (hours * 60 + minutes) * 60 * 1000
       );
     }
   };
@@ -92,10 +127,25 @@ const SecurityTimerScreen: React.FC = () => {
     }
   };
 
+  const handleSafeAction = () => {
+    setPopupVisible(false);
+    // Additional logic if needed
+  };
+
+  const handleNotSafeAction = () => {
+    Alert.alert(
+      "Emergency Alert",
+      "Your location has been sent to your emergency contacts."
+    );
+    setPopupVisible(false);
+    // Add logic to send SMS to contacts here
+  };
+
   return (
-    <ScrollView contentContainerStyle={styles.safetyTimerMainContainer}
-    showsVerticalScrollIndicator={false}>
-      
+    <ScrollView
+      contentContainerStyle={styles.safetyTimerMainContainer}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={styles.safetyTimerInfo}>
         <View style={styles.safetyTimerInfoTop}>
           <Text style={styles.title}>Enable Safety Timer</Text>
@@ -116,9 +166,8 @@ const SecurityTimerScreen: React.FC = () => {
         </View>
       </View>
 
-      {/* Timer Settings */}
-      <View style={styles.safetyTimerSettings}>
-        <View style={styles.safetyTimerSetContainer}>
+      <View>
+        <View>
           <Text style={styles.title}>Set Timer</Text>
           <View style={styles.pickerContainer}>
             <Picker
@@ -145,7 +194,6 @@ const SecurityTimerScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* Contact Input Fields */}
         <View style={styles.contactInputContainer}>
           <Text style={styles.title}>Enter Emergency Contacts</Text>
           {safetyTimerContacts.map((contact, index) => (
@@ -174,18 +222,23 @@ const SecurityTimerScreen: React.FC = () => {
           <Text style={styles.buttonText}>Save</Text>
         </TouchableOpacity>
       </View>
+
+      <SafetyConfirmationPopup
+        visible={popupVisible}
+        onConfirm={handleSafeAction}
+        onCancel={handleNotSafeAction}
+      />
     </ScrollView>
   );
 };
 
 export default SecurityTimerScreen;
 
-
 const styles = StyleSheet.create({
   safetyTimerMainContainer: {
     flexGrow: 1,
     padding: 20,
-    backgroundColor: "#f2d7f7", 
+    backgroundColor: "#f2d7f7",
     borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -194,11 +247,25 @@ const styles = StyleSheet.create({
     elevation: 3,
     paddingBottom: 80,
   },
+  safetyTimerInfo: {
+    marginBottom: 20,
+  },
+  safetyTimerInfoTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  safetyTimerInfoBottom: {
+    padding: 10,
+    backgroundColor: "#e9ecef",
+    borderRadius: 5,
+  },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     color: "#333",
-    marginBottom: 20,
+    marginBottom: 10,
   },
   pickerContainer: {
     flexDirection: "row",
@@ -224,61 +291,58 @@ const styles = StyleSheet.create({
   },
   contactInput: {
     height: 50,
-    borderColor: "#7A4791", // Matching border color
+    borderColor: "#7A4791",
     borderWidth: 1,
-    borderRadius: 8,
-    marginBottom: 15,
-    paddingHorizontal: 15,
-    backgroundColor: "#fff",
-    color: "#7A4791",
-    // fontFamily: "Poppins_400Regular",
+    borderRadius: 5,
+    marginBottom: 10,
+    paddingHorizontal: 10,
   },
   addContactButton: {
-    marginTop: 10,
-    padding: 14,
-    backgroundColor: "#9067c6", // Consistent button color
-    borderRadius: 10,
     alignItems: "center",
+    padding: 10,
+    backgroundColor: "#5D6D7E",
+    borderRadius: 5,
+    marginTop: 5,
   },
   saveButton: {
-    marginTop: 20,
-    padding: 14,
-    backgroundColor: "#9067c6",
-    borderRadius: 10,
     alignItems: "center",
+    padding: 15,
+    backgroundColor: "#5D6D7E",
+    borderRadius: 5,
+    marginTop: 20,
   },
   buttonText: {
     color: "#fff",
     fontSize: 16,
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    width: "80%",
+    padding: 20,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  modalText: {
+    fontSize: 18,
     fontWeight: "bold",
-    // fontFamily: "Poppins_700Bold",
-  },
-  safetyTimerInfo: {
     marginBottom: 20,
-    padding: 15,
-    backgroundColor: "#f2d7f7",
-    borderRadius: 5,
   },
-  safetyTimerSettings: {
-    width: "100%",
-    padding: 15,
-    backgroundColor: "#f2d7f7",
-    borderRadius: 5,
-  },
-  safetyTimerSetContainer: {
-    marginBottom: 20,
-    alignItems: "center",
-  },
-  disabledSection: {
-    opacity: 0.5,
-  },
-  safetyTimerInfoTop: {
+  buttonContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    justifyContent: "space-around",
+    width: "100%",
   },
-  safetyTimerInfoBottom: {
-    marginTop: 10,
-    // fontFamily: "Poppins_400Regular",
+  modalButton: {
+    padding: 10,
+    backgroundColor: "#5D6D7E",
+    borderRadius: 5,
+    alignItems: "center",
+    width: "40%",
   },
 });

@@ -17,4 +17,7 @@ declare module "@env" {
   export const REFRESH_TOKEN_EXPIRES_IN: string;
   export const ORGANIZATION_MAIL: string;
   export const ORGANIZATION_PASSWORD: string;
+  export const CLOUD_NAME_CLOUDINARY: string;
+  export const API_KEY_CLOUDINARY: string;
+  export const API_SECRET_CLOUDINARY: string;
 }

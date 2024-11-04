@@ -1,15 +1,11 @@
 import {
-  getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   getIdToken,
 } from "firebase/auth";
-import app from "../../config/firebase.config";
+import { auth, firestore } from "../../config/firebase.config";
 import { hashPassword } from "../../utils/password.utils";
-import { getFirestore, setDoc, doc } from "firebase/firestore";
-
-const auth = getAuth(app);
-const db = getFirestore(app);
+import { setDoc, doc } from "firebase/firestore";
 
 /**
  * Log in a user with email and password
@@ -62,7 +58,7 @@ const registerUser = async (
     const accessToken = await getIdToken(user, true); // 'true' forces token refresh
 
     // Store user details in Firestore
-    await setDoc(doc(db, "users", user.uid), {
+    await setDoc(doc(firestore, "users", user.uid), {
       uid: user.uid,
       email: user.email,
       username: username,

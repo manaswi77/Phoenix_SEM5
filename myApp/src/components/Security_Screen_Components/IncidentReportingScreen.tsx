@@ -14,8 +14,11 @@ import { AppDispatch } from "../../store/store";
 import { useDispatch } from "react-redux";
 import { setCurrentFeature } from "../../contexts/securityFeatureSlice";
 import * as Yup from "yup";
+import { IncidentReportingFormValues } from "../../types/types";
 import { Formik } from "formik";
-import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import { Picker } from "@react-native-picker/picker";
+import saveIncidentReport from "../../services/firebase/securityScreen.services";
 
 const incidentReportingSchema = Yup.object().shape({
   name: Yup.string(),
@@ -24,6 +27,7 @@ const incidentReportingSchema = Yup.object().shape({
   contact: Yup.string()
     .required("Contact number is required")
     .matches(/^[0-9]{10}$/, "Contact number must be 10 digits"),
+  reportTo: Yup.string().required("Please select a report option"),
 });
 
 const IncidentReportingScreen = () => {
@@ -45,53 +49,60 @@ const IncidentReportingScreen = () => {
   }, [dispatch]);
 
   const handleImageUpload = async () => {
-    // Implement your image upload logic here (e.g., using ImagePicker)
-    setImage("path_to_your_image"); // Replace with actual image path
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      Alert.alert("Permission to access camera roll is required!");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
   };
 
-  const handleSubmit = (values: any) => {
-    Alert.alert("Form Submitted", JSON.stringify(values, null, 2));
-    // Add your form submission logic here (e.g., dispatch an action or API call)
-  };
-
-  const handleBackPress = () => {
-    dispatch(setCurrentFeature("features"));
+  const handleSubmit = async (values: IncidentReportingFormValues) => {
+    try {
+      // const imageUrl = image ? await uploadImage(image, `${Date.now()}`) : "";
+      const imageUrl = "";
+      await saveIncidentReport({ ...values, imageUrl });
+      Alert.alert("Report Submitted", "Your incident report has been saved.");
+    } catch (error) {
+      Alert.alert("Error", "An error occurred while submitting the report.");
+    }
   };
 
   return (
     <View style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
-        showsVerticalScrollIndicator={false} 
+        showsVerticalScrollIndicator={false}
       >
         <View style={styles.incidentReportingMainContainer}>
-        <Text style={styles.infoText}>
-              Quickly seek help from government authorities or support
-              organizations in cases of domestic abuse or other wrongful acts.
-              This feature enables you to provide essential details, including
-              images, location, and a description of the incident, to ensure
-              timely and effective assistance.
-            </Text>
+          <Text style={styles.infoText}>
+            Quickly seek help from government authorities or support
+            organizations in cases of domestic abuse or other wrongful acts.
+            This feature enables you to provide essential details, including
+            images, location, and a description of the incident, to ensure
+            timely and effective assistance.
+          </Text>
         </View>
         <View style={styles.incidentReportingMainContainer}>
-          
-          {/* <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
-            <Ionicons name="arrow-back" size={24} color="black" />
-          </TouchableOpacity> */}
-
-          <View style={styles.incidentReportingInfo}>
-            {/* <View style={styles.headerContainer}>
-              <Text style={styles.header}>Report an Incident</Text>
-            </View> */}
-            
-          </View>
-
           <Formik
             initialValues={{
               name: "",
               description: "",
               location: "",
               contact: "",
+              reportTo: "",
+              status: "pending",
             }}
             validationSchema={incidentReportingSchema}
             onSubmit={handleSubmit}
@@ -144,7 +155,7 @@ const IncidentReportingScreen = () => {
                 {errors.location && (
                   <Text style={styles.errorText}>{errors.location}</Text>
                 )}
-                
+
                 <TextInput
                   style={styles.input}
                   placeholder="Contact Number"
@@ -155,6 +166,21 @@ const IncidentReportingScreen = () => {
                 />
                 {errors.contact && (
                   <Text style={styles.errorText}>{errors.contact}</Text>
+                )}
+
+                <Text style={styles.label}>Report to</Text>
+                <Picker
+                  selectedValue={values.reportTo}
+                  style={styles.picker}
+                  onValueChange={handleChange("reportTo")}
+                >
+                  <Picker.Item label="Select an option" value="" />
+                  <Picker.Item label="Nirbhaya Pathak" value="nirbhayaPathak" />
+                  <Picker.Item label="Support Groups" value="supportGroups" />
+                  <Picker.Item label="Everyone" value="everyone" />
+                </Picker>
+                {errors.reportTo && (
+                  <Text style={styles.errorText}>{errors.reportTo}</Text>
                 )}
 
                 <TouchableOpacity
@@ -185,7 +211,7 @@ const styles = StyleSheet.create({
   },
   incidentReportingMainContainer: {
     padding: 20,
-    backgroundColor: "#f2d7f7", // Updated to match SOSButtonScreen
+    backgroundColor: "#f2d7f7",
     borderRadius: 10,
     margin: 10,
     borderColor: "#ddd",
@@ -199,38 +225,9 @@ const styles = StyleSheet.create({
   infoText: {
     fontSize: 16,
     color: "#333",
-    fontFamily: "roboto",
-  },
-  backButton: {
-    position: "absolute",
-    top: 20,
-    left: 20,
-    zIndex: 1,
-  },
-  headerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 15,
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333",
-    marginLeft: 40,
-    fontFamily: "Poppins_700Bold", // Ensure font family matches across screens
-  },
-  description: {
-    fontSize: 16,
-    color: "#333", // Updated for consistency
-    marginBottom: 20,
-    lineHeight: 22,
-    backgroundColor: "#ed87ff",
-    padding: 10,
-    borderRadius: 10,
-    fontFamily: "Poppins_400Regular",
   },
   uploadButton: {
-    backgroundColor: "#9067c6", // Matching button color
+    backgroundColor: "#9067c6",
     padding: 14,
     borderRadius: 10,
     alignItems: "center",
@@ -240,7 +237,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
-    fontFamily: "Poppins_700Bold",
   },
   imagePreview: {
     width: 120,
@@ -252,14 +248,13 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 50,
-    borderColor: "#7A4791", // Matching border color
+    borderColor: "#7A4791",
     borderWidth: 1,
     borderRadius: 8,
     marginBottom: 15,
     paddingHorizontal: 15,
     backgroundColor: "#fff",
     color: "#7A4791",
-    fontFamily: "Poppins_400Regular",
   },
   inputMultiline: {
     height: 100,
@@ -269,17 +264,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingTop: 10,
     backgroundColor: "#fff",
-    borderColor: "#7A4791", // Matching color
-    fontFamily: "Poppins_400Regular",
+    borderColor: "#7A4791",
   },
   errorText: {
     fontSize: 12,
     color: "red",
     marginBottom: 10,
-    fontFamily: "Poppins_400Regular",
   },
   submitButton: {
-    backgroundColor: "#9067c6", // Updated to match SOSButtonScreen
+    backgroundColor: "#9067c6",
     padding: 14,
     borderRadius: 10,
     alignItems: "center",
@@ -289,9 +282,19 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
-    fontFamily: "Poppins_700Bold",
   },
-  incidentReportingInfo: {
-    marginBottom: 20,
+  label: {
+    fontSize: 16,
+    color: "#333",
+    marginBottom: 5,
+  },
+  picker: {
+    height: 50,
+    backgroundColor: "#fff",
+    borderColor: "#7A4791",
+    borderWidth: 1,
+    borderRadius: 8,
+    marginBottom: 15,
+    color: "#7A4791",
   },
 });

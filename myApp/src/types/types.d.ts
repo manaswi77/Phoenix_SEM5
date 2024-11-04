@@ -67,3 +67,13 @@ export interface SecurityScreenData {
   sosButtonContacts: string;
   safetyTimerContacts: string;
 }
+
+export interface IncidentReportingFormValues {
+  name: string;
+  description: string;
+  location: string;
+  contact: string;
+  reportTo: string;
+  imageUrl?: string;
+  status: "pending";
+}
