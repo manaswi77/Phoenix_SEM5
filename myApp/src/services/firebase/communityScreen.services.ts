@@ -1,5 +1,5 @@
 import axios from "axios";
-import { LikeResponse, CommentResponse } from "../types/types";
+import { LikeResponse, CommentResponse } from "../../types/types";
 
 export const likePost = async (
   postId: string,
