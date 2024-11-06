@@ -11,8 +11,8 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "isolatedModules": true,
-    "lib": ["ES6"],
+    "isolatedModules": true,  
+    "lib": ["ESNext", "DOM"],
     "noEmit": true,
     "experimentalDecorators": true,
     "typeRoots": ["./node_modules/@types", "watermelon-db.d.ts"]

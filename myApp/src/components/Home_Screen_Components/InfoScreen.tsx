@@ -34,65 +34,106 @@ const HomeScreen: React.FC = () => {
     dispatch(setCurrentScreen("welcome"));
   };
 
+  const renderWeekDays = () => (
+    ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
+      <Text key={index} style={styles.weekDayText}>{day}</Text>
+    ))
+  );
+
+  // Calendar data for the first week of March
+  const calendarData = [
+    { date: 27, isCurrentMonth: false },
+    { date: 28, isCurrentMonth: false },
+    { date: 1, isCurrentMonth: true },
+    { date: 2, isCurrentMonth: true },
+    { date: 3, isCurrentMonth: true },
+    { date: 4, isCurrentMonth: true },
+    { date: 5, isCurrentMonth: true },
+  ];
+
+  const renderDates = () => (
+    <View style={styles.datesRow}>
+      {calendarData.map((item, index) => (
+        <View 
+          key={index} 
+          style={[
+            styles.dateCircle,
+            item.date === 1 && styles.currentDate,
+            !item.isCurrentMonth && styles.prevMonthDate
+          ]}
+        >
+          <Text style={[
+            styles.dateText,
+            item.date === 1 && styles.currentDateText,
+            !item.isCurrentMonth && styles.prevMonthDateText
+          ]}>
+            {item.date}
+          </Text>
+        </View>
+      ))}
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header Section */}
       <View style={styles.header}>
         <View>
           <Text style={styles.welcomeText}>Welcome</Text>
           <Text style={styles.nameText}>Manaswi</Text>
         </View>
         <TouchableOpacity style={styles.profileButton}>
-          <Feather name="user" size={20} color="#8A2BE2" />
+          <Feather name="user" size={24} color="#8A2BE2" />
         </TouchableOpacity>
       </View>
 
-      <View style={styles.heartImageContainer}>
-        <Image
-          source={{ uri: 'https://res.cloudinary.com/desa0upux/image/upload/v1729229944/numudzsiwnwkgwoqzwww.webp' }}
-          style={styles.heartImage}
-          resizeMode="contain"
-        />
-        {/* <View style={styles.heartTextOverlay}>
-          <Text style={styles.periodText}>Period:</Text>
-          <Text style={styles.dayText}>Day 10</Text>
-          <Text style={styles.pregnancyText}>Possible Pregnancy:</Text>
-          <Text style={styles.percentageText}>12,4%</Text>
-        </View> */}
-      </View>
-       
-      <View style={styles.calendarContainer}>
-        <Text style={styles.monthText}>March 2022</Text>
-        <View style={styles.weekDays}>
-          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
-            <Text key={index} style={styles.weekDayText}>{day}</Text>
-          ))}
+      {/* Main Content Container */}
+      <View style={styles.mainContent}>
+        {/* Heart Image Section */}
+        <View style={styles.heartImageContainer}>
+          <Image
+            source={{ uri: 'https://res.cloudinary.com/desa0upux/image/upload/v1729229944/numudzsiwnwkgwoqzwww.webp' }}
+            style={styles.heartImage}
+            resizeMode="cover"
+          />
         </View>
-        <View style={styles.dates}>
-          {[27, 28, 1, 2, 3].map((date, index) => (
-            <View key={index} style={[styles.dateCircle, date === 1 && styles.currentDate]}>
-              <Text style={[styles.dateText, date === 1 && styles.currentDateText]}>{date}</Text>
-            </View>
-          ))}
-        </View>
-      </View>
 
-      <View style={styles.articleContainer}>
-        <View style={styles.articleHeader}>
-          <Text style={styles.sectionTitle}>Article</Text>
-          <TouchableOpacity>
-            <Text style={styles.seeAllText}>See all</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.articleCards}>
-          {articleData.map((article, index) => (
-            <TouchableOpacity key={index} style={styles.articleCard}>
-              <Image
-                source={{ uri: article.imageUrl }}
-                style={styles.articleImage}
-              />
-              <Text style={styles.articleTitle}>{article.title}</Text>
-            </TouchableOpacity>
-          ))}
+        {/* Calendar and Articles Container */}
+        <View style={styles.bottomContainer}>
+          {/* Calendar Section */}
+          <View style={styles.calendarContainer}>
+            <Text style={styles.monthText}>March 2022</Text>
+            <View style={styles.weekDays}>{renderWeekDays()}</View>
+            {renderDates()}
+          </View>
+
+          {/* Articles Section */}
+          <View style={styles.articleContainer}>
+            <View style={styles.articleHeader}>
+              <Text style={styles.sectionTitle}>Article</Text>
+              <TouchableOpacity>
+                <Text style={styles.seeAllText}>See all</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.articleCards}>
+              {articleData.map((article, index) => (
+                <TouchableOpacity 
+                  key={index} 
+                  style={styles.articleCard}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.articleImageContainer}>
+                    <Image
+                      source={{ uri: article.imageUrl }}
+                      style={styles.articleImage}
+                      resizeMode="cover"
+                    />
+                  </View>
+                  <Text style={styles.articleTitle}>{article.title}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
         </View>
       </View>
     </SafeAreaView>
@@ -103,145 +144,145 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FBF7FC',
-    paddingHorizontal: width * 0.04,
-    paddingTop: height * 0.02,
-    paddingBottom: height * 0.04,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: height * 0.02,
+    paddingHorizontal: width * 0.05,
+    paddingVertical: height * 0.02,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0E6FF',
   },
   welcomeText: {
-    fontSize: width * 0.035,
+    fontSize: 16,
     color: '#888',
+    fontWeight: '500',
   },
   nameText: {
-    fontSize: width * 0.045,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
+    marginTop: 4,
   },
   profileButton: {
-    width: width * 0.1,
-    height: width * 0.1,
-    borderRadius: width * 0.05,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: '#F0E6FF',
     justifyContent: 'center',
     alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#8A2BE2',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  mainContent: {
+    flex: 1,
+    paddingHorizontal: width * 0.05,
   },
   heartImageContainer: {
-    width: width * 0.9,
-    height: width * 0.9,
-    alignSelf: 'center',
-    marginBottom: height * 0.02,
-    position: 'relative',
-    borderRadius : 15,
-    backgroundColor: 'transparent',
+    height: '45%',
+    marginVertical: height * 0.02,
+    borderRadius: 25,
+    overflow: 'hidden',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   heartImage: {
     width: '100%',
     height: '100%',
-    borderRadius : 45,
-    backgroundColor: 'transparent',
+    borderRadius: 25,
   },
-  heartTextOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  periodText: {
-    fontSize: width * 0.04,
-    color: '#FFF',
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
-  },
-  dayText: {
-    fontSize: width * 0.08,
-    fontWeight: 'bold',
-    color: '#FFF',
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
-  },
-  pregnancyText: {
-    fontSize: width * 0.035,
-    color: '#FFF',
-    marginTop: height * 0.01,
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
-  },
-  percentageText: {
-    fontSize: width * 0.06,
-    fontWeight: 'bold',
-    color: '#FFF',
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
+  bottomContainer: {
+    height: '45%',
+    justifyContent: 'space-between',
   },
   calendarContainer: {
     backgroundColor: '#FFF',
-    borderRadius: width * 0.05,
+    borderRadius: 20,
     padding: width * 0.04,
-    marginBottom: height * 0.02,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
   },
   monthText: {
-    fontSize: width * 0.04,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: height * 0.01,
+    marginBottom: 12,
+    color: '#333',
   },
   weekDays: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: height * 0.01,
+    marginBottom: 12,
   },
   weekDayText: {
     color: '#888',
-    fontSize: width * 0.03,
+    fontSize: 14,
+    fontWeight: '500',
+    width: width * 0.1,
+    textAlign: 'center',
   },
-  dates: {
+  datesRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   dateCircle: {
-    width: width * 0.08,
-    height: width * 0.08,
-    borderRadius: width * 0.04,
+    width: width * 0.1,
+    height: width * 0.1,
+    borderRadius: width * 0.05,
     justifyContent: 'center',
     alignItems: 'center',
   },
   currentDate: {
     backgroundColor: '#FF69B4',
+    elevation: 2,
+    shadowColor: '#FF69B4',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+  prevMonthDate: {
+    opacity: 0.5,
   },
   dateText: {
     color: '#333',
-    fontSize: width * 0.03,
+    fontSize: 14,
+    fontWeight: '500',
   },
   currentDateText: {
     color: '#FFF',
+    fontWeight: 'bold',
+  },
+  prevMonthDateText: {
+    color: '#999',
   },
   articleContainer: {
-    marginBottom: height * 0.02,
+    marginTop: height * 0.02,
   },
   articleHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: height * 0.01,
+    marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: width * 0.04,
+    fontSize: 18,
     fontWeight: 'bold',
+    color: '#333',
   },
   seeAllText: {
     color: '#FF69B4',
-    fontSize: width * 0.03,
+    fontSize: 14,
+    fontWeight: '600',
   },
   articleCards: {
     flexDirection: 'row',
@@ -249,20 +290,33 @@ const styles = StyleSheet.create({
   },
   articleCard: {
     backgroundColor: '#FFF',
-    borderRadius: width * 0.03,
-    padding: width * 0.02,
+    borderRadius: 15,
+    padding: 8,
     alignItems: 'center',
     width: width * 0.28,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
   },
-  articleImage: {
+  articleImageContainer: {
     width: width * 0.22,
     height: width * 0.22,
-    borderRadius: width * 0.02,
-    marginBottom: height * 0.005,
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  articleImage: {
+    width: '100%',
+    height: '100%',
   },
   articleTitle: {
     textAlign: 'center',
-    fontSize: width * 0.025,
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#333',
+    paddingHorizontal: 4,
   },
 });
 
