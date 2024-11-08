@@ -15,7 +15,10 @@
     "lib": ["ES6"],
     "noEmit": true,
     "experimentalDecorators": true,
-    "typeRoots": ["./node_modules/@types", "watermelon-db.d.ts"]
+    "typeRoots": ["./node_modules/@types", "watermelon-db.d.ts"],
+    "paths": {
+      "@firebase/auth": ["./node_modules/@firebase/auth/dist/index.rn.d.ts"]
+    }
   },
   "exclude": [
     "node_modules",

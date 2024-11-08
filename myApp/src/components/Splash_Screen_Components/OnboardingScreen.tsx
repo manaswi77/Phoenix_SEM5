@@ -72,12 +72,12 @@ const OnboardingScreen: React.FC = () => {
     if (currentIndex < onboardingData.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
-      dispatch(setCurrentScreen("login"));
+      dispatch(setCurrentScreen("welcome"));
     }
   };
 
   const handleSkip = () => {
-    dispatch(setCurrentScreen("login"));
+    dispatch(setCurrentScreen("welcome"));
   };
 
   const currentItem = onboardingData[currentIndex];

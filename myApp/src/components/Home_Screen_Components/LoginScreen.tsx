@@ -5,13 +5,21 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
+import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useDispatch } from "react-redux";
 import { setIsLoggedIn, setCurrentScreen } from "../../contexts/screenSlice";
 import { AppDispatch } from "../../store/store";
-import React from "react";
+import { CurrentUser, UserSession } from "../../types/types";
+import {
+  loginUser,
+  getCurrentUserInfomation,
+} from "../../services/firebase/auth.services";
+import { setUser, setSession } from "../../contexts/userSlice";
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
@@ -23,6 +31,39 @@ const LoginSchema = Yup.object().shape({
 
 const LoginScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (email: string, password: string) => {
+    setLoading(true);
+    try {
+      const { user, accessToken } = await loginUser(email, password);
+
+      const userInformation = await getCurrentUserInfomation(user.uid);
+
+      const CurrentUserInfo: CurrentUser = {
+        uid: user.uid,
+        email: userInformation.email,
+        name: userInformation.username,
+        profilePhoto: userInformation.photoURL,
+      };
+
+      console.log(userInformation);
+
+      const CurrentUserSession: UserSession = {
+        token: accessToken,
+        isLoggedIn: true,
+      };
+
+      dispatch(setUser(CurrentUserInfo));
+      dispatch(setSession(CurrentUserSession));
+      dispatch(setIsLoggedIn(true));
+      dispatch(setCurrentScreen("info"));
+    } catch (error: any) {
+      Alert.alert("Login Failed", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.loginContainer}>
@@ -32,10 +73,7 @@ const LoginScreen: React.FC = () => {
       <Formik
         initialValues={{ email: "", password: "" }}
         validationSchema={LoginSchema}
-        onSubmit={() => {
-          dispatch(setIsLoggedIn(true));
-          dispatch(setCurrentScreen("info"));
-        }}
+        onSubmit={({ email, password }) => handleLogin(email, password)}
       >
         {({
           handleChange,
@@ -76,7 +114,11 @@ const LoginScreen: React.FC = () => {
               onPress={handleSubmit as any}
               style={styles.loginButton}
             >
-              <Text style={styles.loginText}>Login</Text>
+              {loading ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text style={styles.loginText}>Login</Text>
+              )}
             </TouchableOpacity>
 
             <View style={styles.lineContainer}>

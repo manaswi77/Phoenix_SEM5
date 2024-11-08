@@ -65,4 +65,5 @@ export const {
   setOTPStatus,
   setNewPassword,
 } = changePasswordSlice.actions;
+
 export default changePasswordSlice.reducer;

@@ -24,11 +24,11 @@ export interface UserSession {
   token: string;
 }
 
-export interface User {
-  id: number;
+export interface CurrentUser {
+  uid: string;
   name: string;
   profilePhoto: string;
-  shortDescritption: string;
+  email: string;
 }
 
 export interface Comment {
@@ -68,12 +68,22 @@ export interface SecurityScreenData {
   safetyTimerContacts: string;
 }
 
+export interface SOSButtonInfomation {
+  SOSButtonContacts: string[];
+}
+
 export interface IncidentReportingFormValues {
   name: string;
   description: string;
   location: string;
   contact: string;
-  reportTo: string;
+  reportTo: "nirbhaya pathak" | "support groups" | "everyone";
   imageUrl?: string;
   status: "pending";
 }
+
+export interface SafetyTimerInformation {
+  safetyTimerTimeInterval: number[];
+  safetyTimerContacts: string[];
+}
+

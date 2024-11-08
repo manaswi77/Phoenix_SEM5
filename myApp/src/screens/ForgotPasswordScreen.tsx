@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import MailForPassword from "../components/Home_Screen_Components/Forgot_Screen_component/MailForPassword";
+import MailForPassword from "../components/Home_Screen_Components/Forgot_Screen_component/PasswordReset";
 import OTPForPassword from "../components/Home_Screen_Components/Forgot_Screen_component/OTPForPassword";
 import PasswordChanged from "../components/Home_Screen_Components/Forgot_Screen_component/PasswordChanged";
 import ResetPasswordScreen from "../components/Home_Screen_Components/Forgot_Screen_component/ResetPasswordScreen";

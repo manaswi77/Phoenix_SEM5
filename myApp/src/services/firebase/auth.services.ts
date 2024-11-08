@@ -4,8 +4,7 @@ import {
   getIdToken,
 } from "firebase/auth";
 import { auth, firestore } from "../../config/firebase.config";
-import { hashPassword } from "../../utils/password.utils";
-import { setDoc, doc } from "firebase/firestore";
+import { setDoc, doc, collection, query, where, getDocs } from "firebase/firestore";
 
 /**
  * Log in a user with email and password
@@ -22,10 +21,10 @@ const loginUser = async (email: string, password: string) => {
     );
     const user = userCredential.user;
 
-    // Get Firebase ID token (access token)
-    const accessToken = await getIdToken(user, true); // 'true' forces token refresh
+    console.log(userCredential);
 
-    // Firebase automatically manages refresh tokens, so no need to generate them
+    const accessToken = await getIdToken(user, true); 
+
     return { user, accessToken };
   } catch (error) {
     throw error;
@@ -44,9 +43,6 @@ const registerUser = async (
   username: string
 ) => {
   try {
-    const hashedPassword = hashPassword(password);
-
-    // Register the user with Firebase Authentication
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       email,
@@ -54,22 +50,62 @@ const registerUser = async (
     );
     const user = userCredential.user;
 
-    // Get Firebase ID token (access token)
-    const accessToken = await getIdToken(user, true); // 'true' forces token refresh
+    const accessToken = await getIdToken(user, true);
 
-    // Store user details in Firestore
-    await setDoc(doc(firestore, "users", user.uid), {
+    const userData = {
       uid: user.uid,
       email: user.email,
-      username: username,
-      hashedPassword: hashedPassword,
+      username,
+      profilePhotoUrl: "",
+      contactNumber: "",
+      SOSButtonContacts: ["", "", ""],
+      SafetyTimerContacts: ["", "", ""],
+      SafetyTimerInterval: [0, 15],
+      savedPosts: [],
       createdAt: new Date(),
-    });
+    };
+
+    await setDoc(doc(firestore, "users", user.uid), userData);
 
     return { user, accessToken };
   } catch (error) {
+    console.error("Error registering user:", error);
     throw error;
   }
 };
 
-export { loginUser, registerUser };
+const refreshAccessToken = async () => {
+  const currentUser = auth.currentUser;
+  if (currentUser) {
+    const newIdToken = await currentUser.getIdToken(true);
+    console.log("New access token:", newIdToken);
+    return newIdToken;
+  } else {
+    throw new Error("No active user session found.");
+  }
+};
+
+const getCurrentUserInfomation = async (uid: string) => {
+  try {
+    const usersRef = collection(firestore, "users");
+    const q = query(usersRef, where("uid", "==", uid));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const userData = querySnapshot.docs[0].data();
+      return userData;
+    } else {
+      throw new Error("No user found with the given UID.");
+    }
+  } catch (error) {
+    console.error("Error getting user information:", error);
+    throw error;
+  }
+};
+
+export {
+  loginUser,
+  registerUser,
+  refreshAccessToken,
+  getCurrentUserInfomation,
+};

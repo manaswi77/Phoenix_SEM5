@@ -9,10 +9,11 @@ import {
 } from "react-native";
 import { useDispatch } from "react-redux";
 import { setCurrentScreen } from "../../contexts/screenSlice";
-import { AppDispatch } from "../../store/store"; 
+import { AppDispatch } from "../../store/store";
+import { auth } from "../../config/firebase.config";
 
 const WelcomeScreen: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>(); 
+  const dispatch = useDispatch<AppDispatch>();
 
   const handlePress = (screen: "login" | "register") => {
     dispatch(setCurrentScreen(screen));
@@ -26,9 +27,7 @@ const WelcomeScreen: React.FC = () => {
         }}
         style={styles.image}
       />
-      <Text>
-        Hi There! 
-      </Text>
+      <Text>Hi There!</Text>
       <View style={styles.welcomeScreenButtonContainer}>
         <TouchableOpacity
           style={styles.button}

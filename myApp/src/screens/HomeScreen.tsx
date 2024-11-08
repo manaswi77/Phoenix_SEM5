@@ -12,9 +12,7 @@ import SettingsScreen from "./SettingsScreen";
 import SecurityScreen from "./SecurityScreen";
 import ForgotPasswordScreen from "./ForgotPasswordScreen";
 import { RootState } from "../store/store";
-// import Home from "../components/Home_Screen_Components/Home_screen";
 import OnboardingScreen from "../components/Splash_Screen_Components/OnboardingScreen";
-
 import { AppDispatch } from "../store/store";
 import { setIsLoggedIn, setCurrentScreen } from "../contexts/screenSlice";
 import { checkUserSession as checkUserSessionService } from "../services/database/UserSession.services";
@@ -29,7 +27,8 @@ const HomeScreen: React.FC = () => {
 
   useEffect(() => {
     const fetchUserSession = async () => {
-      const isLoggedIn = await checkUserSessionService();
+      // const isLoggedIn = await checkUserSessionService();
+      
       if (isLoggedIn) {
         dispatch(setIsLoggedIn(true));
         dispatch(setCurrentScreen("info"));

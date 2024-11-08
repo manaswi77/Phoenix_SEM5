@@ -18,7 +18,7 @@ import { IncidentReportingFormValues } from "../../types/types";
 import { Formik } from "formik";
 import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
-import saveIncidentReport from "../../services/firebase/securityScreen.services";
+import { saveIncidentReport } from "../../services/firebase/securityScreen.services";
 
 const incidentReportingSchema = Yup.object().shape({
   name: Yup.string(),
@@ -101,7 +101,7 @@ const IncidentReportingScreen = () => {
               description: "",
               location: "",
               contact: "",
-              reportTo: "",
+              reportTo: "support groups",
               status: "pending",
             }}
             validationSchema={incidentReportingSchema}

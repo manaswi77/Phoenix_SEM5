@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,13 +6,20 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useDispatch } from "react-redux";
 import { setIsLoggedIn, setCurrentScreen } from "../../contexts/screenSlice";
 import { AppDispatch } from "../../store/store";
-import { registerUser } from "../../services/firebase/auth.services";
+import { CurrentUser, UserSession } from "../../types/types";
+import {
+  registerUser,
+  getCurrentUserInfomation,
+} from "../../services/firebase/auth.services";
+import { setUser, setSession } from "../../contexts/userSlice";
 
 const RegisterSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
@@ -24,26 +31,47 @@ const RegisterSchema = Yup.object().shape({
 
 const RegisterScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (values: {
+  const handleRegister = async (values: {
     email: string;
     password: string;
     confirmPassword: string;
     username: string;
   }) => {
+    setLoading(true);
     try {
-      const user = await registerUser(
+      const { user, accessToken } = await registerUser(
         values.email,
         values.password,
         values.username
       );
 
+      const userInformation = await getCurrentUserInfomation(user.uid);
+
+      const CurrentUserInfo: CurrentUser = {
+        uid: user.uid,
+        email: userInformation.email,
+        name: userInformation.username,
+        profilePhoto: userInformation.photoURL,
+      };
+
+      const CurrentUserSession: UserSession = {
+        token: accessToken,
+        isLoggedIn: true,
+      };
+
+      dispatch(setUser(CurrentUserInfo));
+      dispatch(setSession(CurrentUserSession));
       dispatch(setIsLoggedIn(true));
       dispatch(setCurrentScreen("info"));
 
       console.log("User registered successfully:", user);
-    } catch (error) {
+    } catch (error: any) {
+      Alert.alert("Registration failed");
       console.error("Registration error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,7 +86,7 @@ const RegisterScreen: React.FC = () => {
           username: "",
         }}
         validationSchema={RegisterSchema}
-        onSubmit={handleSubmit}
+        onSubmit={handleRegister}
       >
         {({
           handleChange,
@@ -118,7 +146,11 @@ const RegisterScreen: React.FC = () => {
               onPress={handleSubmit as any}
               style={styles.registerButton}
             >
-              <Text style={styles.registerText}>Register</Text>
+              {loading ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text style={styles.registerText}>Register</Text>
+              )}
             </TouchableOpacity>
             <View style={styles.lineContainer}>
               <View style={styles.line} />

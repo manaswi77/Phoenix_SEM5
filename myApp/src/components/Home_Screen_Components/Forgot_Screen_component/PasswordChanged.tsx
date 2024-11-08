@@ -1,11 +1,19 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setCurrentScreen } from "../../../contexts/screenSlice";
 import { AppDispatch } from "../../../store/store";
 
 const PasswordChanged = () => {
   const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      dispatch(setCurrentScreen("login"));
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <View style={styles.passchangedContainer}>
