@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  BackHandler,
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -27,6 +28,20 @@ const ForgotPasswordSchema = Yup.object().shape({
 const MailForPassWord = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const backAction = () => {
+      dispatch(setCurrentScreen("login"));
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, [dispatch]);
 
   const handleForgotPassword = (values: { email: string }) => {
     setLoading(true);

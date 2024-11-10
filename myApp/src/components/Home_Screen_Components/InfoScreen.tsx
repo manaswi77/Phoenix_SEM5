@@ -1,121 +1,139 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
+  ScrollView,
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
   SafeAreaView,
   Dimensions,
+  Image,
+  Alert,
+  ActivityIndicator,
+  ToastAndroid,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import * as Location from "expo-location";
 import { useSelector, useDispatch } from "react-redux";
-import { setCurrentScreen } from "../../contexts/screenSlice";
 import { AppDispatch } from "../../store/store";
 import { RootState } from "../../store/store";
+import AppData from "../../../assets/AppAssets.json";
+import { saveSOSButtonReport } from "../../services/firebase/securityScreen.services";
+import { SOSButtonReportInfomation } from "../../types/types";
+import { sendSmsWithLocation } from "../../utils/notifications.utils";
+import { TEST_NUMBER } from "@env";
 
 const { width, height } = Dimensions.get("window");
 
-interface ArticleData {
-  title: string;
-  imageUrl: string;
-}
-
-const articleData: ArticleData[] = [
-  {
-    title: "Daily Woman",
-    imageUrl:
-      "https://res.cloudinary.com/desa0upux/image/upload/v1729229039/la9fafqkxypajto5e1fb.png",
-  },
-  {
-    title: "Mood Booster",
-    imageUrl:
-      "https://res.cloudinary.com/desa0upux/image/upload/v1729229039/la9fafqkxypajto5e1fb.png",
-  },
-  {
-    title: "Sprout Happiness",
-    imageUrl:
-      "https://res.cloudinary.com/desa0upux/image/upload/v1729229039/la9fafqkxypajto5e1fb.png",
-  },
-];
-
-const HomeScreen: React.FC = () => {
+const InfoScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-
+  const user = useSelector((state: RootState) => state.appUser.user);
   const username = useSelector((state: RootState) => state.appUser.user?.name);
+  const SOSButtonContacts = useSelector(
+    (state: RootState) => state.securityFeature.SOSButtonContacts
+  );
+  const [loading, setLoading] = useState(false);
+
+  const handleEmergency = () => {
+    setLoading(true);
+
+    Location.requestForegroundPermissionsAsync()
+      .then(({ status }) => {
+        if (status !== "granted") {
+          Alert.alert(
+            "Location Permission Denied",
+            "Please enable location services to use the SOS feature."
+          );
+          setLoading(false);
+          return Promise.reject("Location permission denied");
+        }
+
+        return Location.getCurrentPositionAsync({});
+      })
+      .then(async (location) => {
+        const locationLink = `https://maps.google.com/?q=${location.coords.latitude},${location.coords.longitude}`;
+
+        const SOSButtonReport: SOSButtonReportInfomation = {
+          reportedBy: user?.uid || "anonymous",
+          status: "pending",
+          reportedAt: new Date(),
+          location: locationLink,
+        };
+
+        await saveSOSButtonReport(SOSButtonReport);
+
+        // Actual API Call
+        // SOSButtonContacts.forEach((contact) => {
+        //   sendSmsWithLocation(contact, username || "User", locationLink)
+        //     .then(() => {
+        //       console.log(`SMS sent to ${contact}`);
+        //     })
+        //     .catch((error) => {
+        //       console.error(`Error sending SMS to ${contact}:`, error);
+        //     });
+        // });
+
+        sendSmsWithLocation(TEST_NUMBER, username || "User", locationLink)
+          .then(() => {
+            console.log("SMS sent to test number");
+          })
+          .catch((error) => {
+            console.error("Error sending SMS to test number:", error);
+          });
+
+        ToastAndroid.showWithGravity(
+          "Report Saved Successfully! Contacting nearby Nirbhaya Squad",
+          ToastAndroid.LONG,
+          ToastAndroid.BOTTOM
+        );
+      })
+      .catch((error) => {
+        console.error("Error handling emergency:", error);
+        Alert.alert("Error", "Could not send SOS report. Please try again.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.welcomeText}>Welcome</Text>
-          <Text style={styles.nameText}>{username || "User"}</Text>
-        </View>
-        <TouchableOpacity style={styles.profileButton}>
-          <Feather name="user" size={20} color="#8A2BE2" />
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.heartImageContainer}>
-        <Image
-          source={{
-            uri: "https://res.cloudinary.com/desa0upux/image/upload/v1729229944/numudzsiwnwkgwoqzwww.webp",
-          }}
-          style={styles.heartImage}
-          resizeMode="contain"
-        />
-        {/* <View style={styles.heartTextOverlay}>
-          <Text style={styles.periodText}>Period:</Text>
-          <Text style={styles.dayText}>Day 10</Text>
-          <Text style={styles.pregnancyText}>Possible Pregnancy:</Text>
-          <Text style={styles.percentageText}>12,4%</Text>
-        </View> */}
-      </View>
-
-      <View style={styles.calendarContainer}>
-        <Text style={styles.monthText}>March 2022</Text>
-        <View style={styles.weekDays}>
-          {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
-            <Text key={index} style={styles.weekDayText}>
-              {day}
-            </Text>
-          ))}
-        </View>
-        <View style={styles.dates}>
-          {[27, 28, 1, 2, 3].map((date, index) => (
-            <View
-              key={index}
-              style={[styles.dateCircle, date === 1 && styles.currentDate]}
-            >
-              <Text
-                style={[styles.dateText, date === 1 && styles.currentDateText]}
-              >
-                {date}
-              </Text>
-            </View>
-          ))}
-        </View>
-      </View>
-
-      <View style={styles.articleContainer}>
-        <View style={styles.articleHeader}>
-          <Text style={styles.sectionTitle}>Article</Text>
-          <TouchableOpacity>
-            <Text style={styles.seeAllText}>See all</Text>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Header Section */}
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.welcomeText}>Welcome</Text>
+            <Text style={styles.nameText}>{username || "User"}</Text>
+          </View>
+          <TouchableOpacity style={styles.profileButton}>
+            <Feather name="user" size={24} color="#8A2BE2" />
           </TouchableOpacity>
         </View>
-        <View style={styles.articleCards}>
-          {articleData.map((article, index) => (
-            <TouchableOpacity key={index} style={styles.articleCard}>
-              <Image
-                source={{ uri: article.imageUrl }}
-                style={styles.articleImage}
-              />
-              <Text style={styles.articleTitle}>{article.title}</Text>
-            </TouchableOpacity>
-          ))}
+
+        {/* Emergency Section */}
+        <View style={styles.emergencyContainer}>
+          <View style={styles.textImageContainer}>
+            <Text style={styles.emergencyText}>
+              If you're in an emergency or facing a dangerous situation, press
+              the button below. The nearest Nirbhaya Squad will be alerted and
+              will reach you promptly. Additionally, if you've saved trusted
+              contacts in the Security section, they will receive a message with
+              your location.
+            </Text>
+            <Image
+              source={{ uri: AppData.homePageSOSImage }}
+              style={styles.sosImage}
+            />
+          </View>
+          <TouchableOpacity style={styles.sosButton} onPress={handleEmergency}>
+            {loading ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <Text style={styles.sosButtonText}>I Need Help !!!</Text>
+            )}
+          </TouchableOpacity>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -125,166 +143,74 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FBF7FC",
     paddingHorizontal: width * 0.04,
-    paddingTop: height * 0.02,
+    paddingTop: height * 0.01,
     paddingBottom: height * 0.04,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    paddingHorizontal: width * 0.05,
+    paddingVertical: height * 0.02,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F0E6FF",
     marginBottom: height * 0.02,
   },
   welcomeText: {
     fontSize: width * 0.035,
     color: "#888",
+    fontWeight: "500",
   },
   nameText: {
     fontSize: width * 0.045,
     fontWeight: "bold",
     color: "#333",
+    marginTop: 4,
   },
   profileButton: {
-    width: width * 0.1,
-    height: width * 0.1,
-    borderRadius: width * 0.05,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: "#F0E6FF",
     justifyContent: "center",
     alignItems: "center",
   },
-  heartImageContainer: {
-    width: width * 0.9,
-    height: width * 0.9,
-    alignSelf: "center",
-    marginBottom: height * 0.02,
-    position: "relative",
-    borderRadius: 15,
-    backgroundColor: "transparent",
-  },
-  heartImage: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 45,
-    backgroundColor: "transparent",
-  },
-  heartTextOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  periodText: {
-    fontSize: width * 0.04,
-    color: "#FFF",
-    textShadowColor: "rgba(0, 0, 0, 0.75)",
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
-  },
-  dayText: {
-    fontSize: width * 0.08,
-    fontWeight: "bold",
-    color: "#FFF",
-    textShadowColor: "rgba(0, 0, 0, 0.75)",
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
-  },
-  pregnancyText: {
-    fontSize: width * 0.035,
-    color: "#FFF",
-    marginTop: height * 0.01,
-    textShadowColor: "rgba(0, 0, 0, 0.75)",
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
-  },
-  percentageText: {
-    fontSize: width * 0.06,
-    fontWeight: "bold",
-    color: "#FFF",
-    textShadowColor: "rgba(0, 0, 0, 0.75)",
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
-  },
-  calendarContainer: {
-    backgroundColor: "#FFF",
-    borderRadius: width * 0.05,
+  emergencyContainer: {
+    backgroundColor: "#f0eff4",
+    borderRadius: 10,
     padding: width * 0.04,
+    elevation: 4,
+    marginVertical: height * 0.02,
+  },
+  textImageContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: height * 0.02,
   },
-  monthText: {
-    fontSize: width * 0.04,
-    fontWeight: "bold",
-    marginBottom: height * 0.01,
-  },
-  weekDays: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: height * 0.01,
-  },
-  weekDayText: {
-    color: "#888",
-    fontSize: width * 0.03,
-  },
-  dates: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  dateCircle: {
-    width: width * 0.08,
-    height: width * 0.08,
-    borderRadius: width * 0.04,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  currentDate: {
-    backgroundColor: "#FF69B4",
-  },
-  dateText: {
+  emergencyText: {
+    flex: 1,
+    fontSize: width * 0.035,
     color: "#333",
-    fontSize: width * 0.03,
+    marginRight: width * 0.04,
   },
-  currentDateText: {
+  sosImage: {
+    width: 150,
+    height: 150,
+  },
+  sosButton: {
+    backgroundColor: "#f75252",
+    alignSelf: "center",
+    paddingVertical: height * 0.02,
+    paddingHorizontal: width * 0.1,
+    borderRadius: 5,
+    marginTop: height * 0.01,
+  },
+  sosButtonText: {
     color: "#FFF",
-  },
-  articleContainer: {
-    marginBottom: height * 0.02,
-  },
-  articleHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: height * 0.01,
-  },
-  sectionTitle: {
-    fontSize: width * 0.04,
     fontWeight: "bold",
-  },
-  seeAllText: {
-    color: "#FF69B4",
-    fontSize: width * 0.03,
-  },
-  articleCards: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  articleCard: {
-    backgroundColor: "#FFF",
-    borderRadius: width * 0.03,
-    padding: width * 0.02,
-    alignItems: "center",
-    width: width * 0.28,
-  },
-  articleImage: {
-    width: width * 0.22,
-    height: width * 0.22,
-    borderRadius: width * 0.02,
-    marginBottom: height * 0.005,
-  },
-  articleTitle: {
-    textAlign: "center",
-    fontSize: width * 0.025,
+    fontSize: width * 0.04,
   },
 });
 
-export default HomeScreen;
+export default InfoScreen;

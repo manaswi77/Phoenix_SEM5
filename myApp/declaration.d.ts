@@ -20,4 +20,6 @@ declare module "@env" {
   export const CLOUD_NAME_CLOUDINARY: string;
   export const API_KEY_CLOUDINARY: string;
   export const API_SECRET_CLOUDINARY: string;
+  export const TEST_NUMBER: string;
+  export const BACKEND_URL: string;
 }

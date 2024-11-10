@@ -4,7 +4,16 @@ import {
   getIdToken,
 } from "firebase/auth";
 import { auth, firestore } from "../../config/firebase.config";
-import { setDoc, doc, collection, query, where, getDocs } from "firebase/firestore";
+import {
+  setDoc,
+  doc,
+  collection,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
+import AppData from "../../../assets/AppAssets.json";
 
 /**
  * Log in a user with email and password
@@ -21,9 +30,7 @@ const loginUser = async (email: string, password: string) => {
     );
     const user = userCredential.user;
 
-    console.log(userCredential);
-
-    const accessToken = await getIdToken(user, true); 
+    const accessToken = await getIdToken(user, true);
 
     return { user, accessToken };
   } catch (error) {
@@ -52,11 +59,16 @@ const registerUser = async (
 
     const accessToken = await getIdToken(user, true);
 
+    const randomIndx = Math.floor(
+      Math.random() * AppData.profilePictures.length
+    );
+    const randomProfilePic = AppData.profilePictures[randomIndx];
+
     const userData = {
       uid: user.uid,
       email: user.email,
       username,
-      profilePhotoUrl: "",
+      profilePhotoUrl: randomProfilePic,
       contactNumber: "",
       SOSButtonContacts: ["", "", ""],
       SafetyTimerContacts: ["", "", ""],
@@ -103,9 +115,57 @@ const getCurrentUserInfomation = async (uid: string) => {
   }
 };
 
+/**
+ * Updates the username for a user in the Firestore database.
+ * @param uid - The user's unique ID.
+ * @param username - The new username to update.
+ * @returns A promise that resolves to true if the update was successful, otherwise false.
+ */
+const updateUserName = async (
+  uid: string,
+  username: string
+): Promise<boolean> => {
+  if (!uid || !username) {
+    console.error("Invalid inputs: UID or username is missing.");
+    return false;
+  }
+
+  try {
+    const userDocRef = doc(firestore, "users", uid);
+    await updateDoc(userDocRef, { username });
+    console.log("Username updated successfully.");
+
+    return true; 
+  } catch (error) {
+    console.error("Error updating username:", error);
+    return false; 
+  }
+};
+
+const updateContactNumber = async (
+  uid: string,
+  contactNumber: string
+): Promise<boolean> => {
+  if (!uid || !contactNumber) {
+    console.error("Invalid inputs: uid or contact number is missing.");
+    return false;
+  }
+  try {
+    const userDocRef = doc(firestore, "users", uid);
+    await updateDoc(userDocRef, { contactNumber });
+    console.log("Contact number updated successfully.");
+    return true;
+  } catch (error) {
+    console.error("Error updating contact number:", error);
+    return false;
+  }
+};
+
 export {
   loginUser,
   registerUser,
   refreshAccessToken,
   getCurrentUserInfomation,
+  updateUserName,
+  updateContactNumber,
 };

@@ -61,8 +61,6 @@ export interface CommentResponse {
 }
 
 export interface SecurityScreenData {
-  isSOSButtonEnabled: number;
-  isSafetyTimerEnabled: number;
   safetyTimerTimeInterval: string;
   sosButtonContacts: string;
   safetyTimerContacts: string;
@@ -87,3 +85,9 @@ export interface SafetyTimerInformation {
   safetyTimerContacts: string[];
 }
 
+export interface SOSButtonReportInfomation {
+  reportedBy: string;
+  status: "pending";
+  reportedAt: Date;
+  location: string;
+}

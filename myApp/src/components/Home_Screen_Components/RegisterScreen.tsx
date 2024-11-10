@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  ToastAndroid,
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -48,6 +49,12 @@ const RegisterScreen: React.FC = () => {
       );
 
       const userInformation = await getCurrentUserInfomation(user.uid);
+
+      ToastAndroid.showWithGravity(
+        "Registration Successful",
+        ToastAndroid.LONG,
+        ToastAndroid.BOTTOM
+      );
 
       const CurrentUserInfo: CurrentUser = {
         uid: user.uid,

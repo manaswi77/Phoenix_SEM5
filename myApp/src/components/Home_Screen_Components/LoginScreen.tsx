@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  ToastAndroid,
 } from "react-native";
 import React, { useState } from "react";
 import { Formik } from "formik";
@@ -20,6 +21,11 @@ import {
   getCurrentUserInfomation,
 } from "../../services/firebase/auth.services";
 import { setUser, setSession } from "../../contexts/userSlice";
+import {
+  updateSafetyTimerTimeInterval,
+  setSOSButtonContacts,
+  setSafetyTimerContacts,
+} from "../../contexts/securityFeatureSlice";
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
@@ -40,11 +46,17 @@ const LoginScreen: React.FC = () => {
 
       const userInformation = await getCurrentUserInfomation(user.uid);
 
+      ToastAndroid.showWithGravity(
+        "Login Successful",
+        ToastAndroid.LONG,
+        ToastAndroid.BOTTOM
+      );
+
       const CurrentUserInfo: CurrentUser = {
         uid: user.uid,
         email: userInformation.email,
         name: userInformation.username,
-        profilePhoto: userInformation.photoURL,
+        profilePhoto: userInformation.profilePhotoUrl,
       };
 
       console.log(userInformation);
@@ -54,8 +66,25 @@ const LoginScreen: React.FC = () => {
         isLoggedIn: true,
       };
 
+      console.log(userInformation.SOSButtonContacts);
+
       dispatch(setUser(CurrentUserInfo));
       dispatch(setSession(CurrentUserSession));
+      dispatch(
+        updateSafetyTimerTimeInterval(
+          userInformation.SafetyTimerInterval || [0, 15]
+        )
+      );
+      dispatch(
+        setSOSButtonContacts(userInformation.SOSButtonContacts) || ["", "", ""]
+      );
+      dispatch(
+        setSafetyTimerContacts(userInformation.SafetyTimerContacts) || [
+          "",
+          "",
+          "",
+        ]
+      );
       dispatch(setIsLoggedIn(true));
       dispatch(setCurrentScreen("info"));
     } catch (error: any) {

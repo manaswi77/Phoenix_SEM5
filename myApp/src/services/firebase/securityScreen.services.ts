@@ -8,7 +8,10 @@ import {
   query,
   getDocs,
 } from "firebase/firestore";
-import { IncidentReportingFormValues } from "../../types/types";
+import {
+  SOSButtonReportInfomation,
+  IncidentReportingFormValues,
+} from "../../types/types";
 
 const getSOSButtonInformation = async (userId: string) => {
   try {
@@ -48,11 +51,14 @@ const getSafetyTimerInformation = async (userId: string) => {
   }
 };
 
-const saveSOSButtonReport = async (data: any) => {
+const saveSOSButtonReport = async (
+  data: SOSButtonReportInfomation
+): Promise<string> => {
   try {
     const sosButtonReportsRef = collection(firestore, "sosButtonReports");
-    await addDoc(sosButtonReportsRef, data);
-    console.log("SOS button report saved successfully!");
+    const docRef = await addDoc(sosButtonReportsRef, data);
+    console.log("SOS button report saved successfully!", docRef.id);
+    return docRef.id;
   } catch (error) {
     console.error("Error saving SOS button report:", error);
     throw error;
@@ -81,27 +87,22 @@ const saveSafetyTimerReport = async (data: any) => {
   }
 };
 
-const updateSOSButtonInformation = async (data: any) => {
+const updateUserData = async (
+  uid: string,
+  data: Partial<{
+    SOSButtonContacts: string[];
+    SafetyTimerContacts: string[];
+    SafetyTimerInterval: number[];
+  }>
+): Promise<boolean> => {
   try {
-    const sosButtonDocRef = doc(firestore, "sosButtonInfo", data.id);
-    const { id, ...updateData } = data;
-    await updateDoc(sosButtonDocRef, updateData);
-    console.log("SOS button information updated successfully!");
+    const userDocRef = doc(firestore, "users", uid);
+    await updateDoc(userDocRef, data);
+    console.log("User data updated successfully!");
+    return true;
   } catch (error) {
-    console.error("Error updating SOS button information:", error);
-    throw error;
-  }
-};
-
-const updateSafetyTimerInformation = async (data: any) => {
-  try {
-    const safetyTimerDocRef = doc(firestore, "safetyTimerInfo", data.id);
-    const { id, ...updateData } = data;
-    await updateDoc(safetyTimerDocRef, updateData);
-    console.log("Safety timer information updated successfully!");
-  } catch (error) {
-    console.error("Error updating safety timer information:", error);
-    throw error;
+    console.error("Error updating user data:", error);
+    return false;
   }
 };
 
@@ -111,6 +112,5 @@ export {
   saveSOSButtonReport,
   saveIncidentReport,
   saveSafetyTimerReport,
-  updateSOSButtonInformation,
-  updateSafetyTimerInformation,
+  updateUserData
 };

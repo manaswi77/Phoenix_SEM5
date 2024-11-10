@@ -8,10 +8,10 @@ interface CustomIconProps {
 }
 
 const CustomIcon: React.FC<CustomIconProps> = ({
+  color = "#000000",
   size = 24,
-  fill = "#000000",
 }) => (
-  <Svg height={size} width={size} viewBox="0 0 263.976 263.976" fill={fill}>
+  <Svg height={size} width={size} viewBox="0 0 263.976 263.976" fill={color}>
     <Path
       d="M149.763,36.21c3.01-3.811,4.871-8.616,4.871-13.837C154.634,10.036,144.628,0,132.291,0s-22.358,10.036-22.358,22.373
 		c0,5.222,1.597,10.026,4.605,13.837c-9.211,5.839-15.55,16.117-15.55,27.807v27.22c0,4.143,3.785,7.739,7.928,7.739h50.811

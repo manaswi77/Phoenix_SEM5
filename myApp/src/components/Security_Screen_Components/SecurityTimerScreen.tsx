@@ -5,21 +5,26 @@ import {
   TouchableOpacity,
   Alert,
   BackHandler,
-  Switch,
+  Image,
   TextInput,
   ScrollView,
   Modal,
+  ToastAndroid,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import { AppDispatch, RootState } from "../../store/store";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setCurrentFeature,
   setSafetyTimerState,
   updateSafetyTimerTimeInterval,
-  addSafetyTimerContact,
+  setSafetyTimerContacts,
 } from "../../contexts/securityFeatureSlice";
+import { setCurrentScreen } from "../../contexts/screenSlice";
 import { Picker } from "@react-native-picker/picker";
+import { updateUserData } from "../../services/firebase/securityScreen.services";
 
 const SafetyConfirmationPopup = ({
   visible,
@@ -49,25 +54,28 @@ const SafetyConfirmationPopup = ({
 
 const SecurityTimerScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-
   const safetyTimerInterval = useSelector(
     (state: RootState) => state.securityFeature.safetyTimerTimeInterval
   );
-
-  const isSafetyTimerEnabled = useSelector(
-    (state: RootState) => state.securityFeature.isSafetyTimerEnabled
-  );
-
-  const safetyTimerContacts = useSelector(
+  const SafetyTimerContacts = useSelector(
     (state: RootState) => state.securityFeature.safetyTimerContacts
   );
 
+  const [loading, setLoading] = useState(false);
+  const [isChanged, setIsChanged] = useState(false);
   const [hours, setHours] = useState<number>(safetyTimerInterval[0]);
   const [minutes, setMinutes] = useState<number>(safetyTimerInterval[1]);
   const [popupVisible, setPopupVisible] = useState<boolean>(false);
 
+  const [contacts, setContacts] = useState<string[]>(() => {
+    const updatedContacts = [...SafetyTimerContacts];
+    while (updatedContacts.length < 3) updatedContacts.push("");
+    return updatedContacts;
+  });
+
   useEffect(() => {
     const backAction = () => {
+      dispatch(setCurrentScreen("security"));
       dispatch(setCurrentFeature("features"));
       return true;
     };
@@ -89,10 +97,6 @@ const SecurityTimerScreen: React.FC = () => {
   };
 
   const handleSave = () => {
-    if (!isSafetyTimerEnabled) {
-      Alert.alert("Safety Timer Disabled", "Please enable the safety timer.");
-      return;
-    }
     if (validateTime()) {
       dispatch(updateSafetyTimerTimeInterval([hours, minutes]));
 
@@ -109,22 +113,14 @@ const SecurityTimerScreen: React.FC = () => {
       );
     }
   };
-
-  const handleContactChange = (text: string, index: number) => {
-    const updatedContacts = [...safetyTimerContacts];
+  const handleContactChange = (index: number, text: string) => {
+    const updatedContacts = [...contacts];
     updatedContacts[index] = text;
-    dispatch(addSafetyTimerContact(updatedContacts[index]));
-  };
+    setContacts(updatedContacts);
 
-  const addContactField = () => {
-    const emptyIndex = safetyTimerContacts.indexOf("");
-    if (emptyIndex !== -1) {
-      const updatedContacts = [...safetyTimerContacts];
-      updatedContacts[emptyIndex] = "";
-      dispatch(addSafetyTimerContact(updatedContacts[emptyIndex]));
-    } else {
-      console.warn("All Safety Timer contacts are already filled.");
-    }
+    setIsChanged(
+      updatedContacts.some((contact, i) => contact !== SafetyTimerContacts[i])
+    );
   };
 
   const handleSafeAction = () => {
@@ -142,92 +138,90 @@ const SecurityTimerScreen: React.FC = () => {
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.safetyTimerMainContainer}
-      showsVerticalScrollIndicator={false}
-    >
-      <View style={styles.safetyTimerInfo}>
-        <View style={styles.safetyTimerInfoTop}>
-          <Text style={styles.title}>Enable Safety Timer</Text>
-          <Switch
-            value={isSafetyTimerEnabled}
-            onValueChange={(value) => {
-              dispatch(setSafetyTimerState());
-            }}
-          />
-        </View>
-        <View style={styles.safetyTimerInfoBottom}>
-          <Text>
-            In this feature, you can set a custom time interval, after which you
-            will receive a notification prompting you to confirm your safety. If
-            you do not verify within the specified time, your current location
-            will automatically be sent to your pre-selected emergency contacts.
-          </Text>
+    <ScrollView showsVerticalScrollIndicator={false}>
+      <Text style={styles.heading}>Safety Timer</Text>
+
+      <View style={styles.safetyTimerMainContainer}>
+        <Text style={styles.infoText}>
+          This feature allows you to set a custom time interval, after which
+          you'll receive a prompt to confirm your safety. If you don’t respond
+          within the given time, your current location will automatically be
+          shared with your selected emergency contacts.{" "}
+        </Text>
+
+        {/* Image below description */}
+        <Image
+          source={{
+            uri: "https://res.cloudinary.com/desa0upux/image/upload/v1731178507/dwnplkw7sjrrxwgcehv5.png", // Replace with your actual image link
+          }}
+          style={styles.infoImage}
+        />
+      </View>
+
+      <View style={styles.pickerContainerMain}>
+        <Text style={styles.timerTitle}>Set Timer</Text>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={hours}
+            style={styles.picker}
+            onValueChange={(itemValue: number) => setHours(itemValue)}
+          >
+            {[0, 1, 2, 3, 4, 5, 6].map((index) => (
+              <Picker.Item key={index} label={`${index}`} value={index} />
+            ))}
+          </Picker>
+          <Text style={styles.colon}>:</Text>
+          <Picker
+            selectedValue={minutes}
+            style={styles.picker}
+            onValueChange={(itemValue: number) => setMinutes(itemValue)}
+          >
+            {[0, 15, 30, 45].map((value) => (
+              <Picker.Item key={value} label={`${value}`} value={value} />
+            ))}
+          </Picker>
         </View>
       </View>
 
-      <View>
-        <View>
-          <Text style={styles.title}>Set Timer</Text>
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={hours}
-              style={styles.picker}
-              onValueChange={(itemValue: number) => setHours(itemValue)}
-              enabled={isSafetyTimerEnabled}
-            >
-              {[0, 1, 2, 3, 4, 5, 6].map((index) => (
-                <Picker.Item key={index} label={`${index}`} value={index} />
-              ))}
-            </Picker>
-            <Text style={styles.colon}>:</Text>
-            <Picker
-              selectedValue={minutes}
-              style={styles.picker}
-              onValueChange={(itemValue: number) => setMinutes(itemValue)}
-              enabled={isSafetyTimerEnabled}
-            >
-              {[0, 15, 30, 45].map((value) => (
-                <Picker.Item key={value} label={`${value}`} value={value} />
-              ))}
-            </Picker>
+      <View style={styles.contactInputContainer}>
+        <Text style={styles.contactTitle}>Enter Emergency Contacts</Text>
+
+        {contacts.map((contact, index) => (
+          <View key={index} style={styles.contactRow}>
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.contactInput}
+                placeholder={`Contact Number ${index + 1}`}
+                value={contact}
+                onChangeText={(text) => handleContactChange(index, text)}
+                keyboardType="phone-pad"
+              />
+              {contact ? (
+                <TouchableOpacity
+                  onPress={() => handleContactChange(index, "")}
+                  style={styles.iconContainer}
+                >
+                  <AntDesign name="edit" size={20} color="#7A4791" />
+                </TouchableOpacity>
+              ) : null}
+            </View>
           </View>
-        </View>
+        ))}
 
-        <View style={styles.contactInputContainer}>
-          <Text style={styles.title}>Enter Emergency Contacts</Text>
-          {safetyTimerContacts.map((contact, index) => (
-            <TextInput
-              key={index}
-              style={styles.contactInput}
-              placeholder={`Contact Number ${index + 1}`}
-              value={contact}
-              onChangeText={(text) => handleContactChange(text, index)}
-              keyboardType="phone-pad"
-            />
-          ))}
-          <TouchableOpacity
-            style={styles.addContactButton}
-            onPress={addContactField}
-          >
-            <Text style={styles.buttonText}>Add Another Contact</Text>
-          </TouchableOpacity>
-        </View>
+        {isChanged && (
+          <Text style={styles.changeMessage}>
+            Please save the changes to your contacts.
+          </Text>
+        )}
 
-        <TouchableOpacity
-          style={styles.saveButton}
-          onPress={handleSave}
-          disabled={!isSafetyTimerEnabled}
-        >
-          <Text style={styles.buttonText}>Save</Text>
+        <TouchableOpacity style={styles.button} onPress={handleSave}>
+          {loading ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <Text style={styles.buttonText}>Save</Text>
+          )}
         </TouchableOpacity>
       </View>
-
-      <SafetyConfirmationPopup
-        visible={popupVisible}
-        onConfirm={handleSafeAction}
-        onCancel={handleNotSafeAction}
-      />
     </ScrollView>
   );
 };
@@ -235,17 +229,50 @@ const SecurityTimerScreen: React.FC = () => {
 export default SecurityTimerScreen;
 
 const styles = StyleSheet.create({
+  heading: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
+    color: "#7A4791",
+  },
   safetyTimerMainContainer: {
-    flexGrow: 1,
     padding: 20,
-    backgroundColor: "#f2d7f7",
+    backgroundColor: "#f0eff4",
     borderRadius: 10,
+    margin: 10,
+    borderColor: "#ddd",
+    borderWidth: 1,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 3,
-    paddingBottom: 80,
+  },
+  infoText: {
+    fontSize: 16,
+    color: "#333",
+    marginBottom: 5,
+  },
+  infoImage: {
+    width: "100%",
+    height: 200,
+    resizeMode: "contain",
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  pickerContainerMain: {
+    padding: 20,
+    backgroundColor: "#f0eff4",
+    borderRadius: 10,
+    margin: 10,
+    borderColor: "#ddd",
+    borderWidth: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 3,
   },
   safetyTimerInfo: {
     marginBottom: 20,
@@ -256,16 +283,17 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 10,
   },
+  timerTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
+    color: "#7A4791",
+  },
   safetyTimerInfoBottom: {
     padding: 10,
     backgroundColor: "#e9ecef",
     borderRadius: 5,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 10,
   },
   pickerContainer: {
     flexDirection: "row",
@@ -286,16 +314,45 @@ const styles = StyleSheet.create({
     color: "#495057",
   },
   contactInputContainer: {
-    width: "100%",
-    marginBottom: 20,
+    padding: 20,
+    backgroundColor: "#f0eff4",
+    borderRadius: 10,
+    margin: 10,
+    borderColor: "#ddd",
+    borderWidth: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 3,
+    marginBottom: 90,
   },
-  contactInput: {
-    height: 50,
+  contactTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
+    color: "#7A4791",
+  },
+  contactRow: {
+    marginBottom: 10,
+  },
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
     borderColor: "#7A4791",
     borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 10,
-    paddingHorizontal: 10,
+    borderRadius: 8,
+    backgroundColor: "#fff",
+  },
+  contactInput: {
+    flex: 1,
+    padding: 10,
+    fontSize: 16,
+    color: "#7A4791",
+  },
+  iconContainer: {
+    padding: 10,
   },
   addContactButton: {
     alignItems: "center",
@@ -311,9 +368,22 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: 20,
   },
+  button: {
+    backgroundColor: "#9067c6",
+    padding: 14,
+    borderRadius: 10,
+    alignItems: "center",
+    marginVertical: 10,
+  },
   buttonText: {
     color: "#fff",
     fontSize: 16,
+  },
+  changeMessage: {
+    fontSize: 14,
+    color: "#f75252",
+    marginTop: 5,
+    textAlign: "center",
   },
   overlay: {
     flex: 1,
