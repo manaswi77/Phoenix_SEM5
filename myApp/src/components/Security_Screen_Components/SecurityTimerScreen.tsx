@@ -11,8 +11,10 @@ import {
   Modal,
   ToastAndroid,
   ActivityIndicator,
+  Vibration,
 } from "react-native";
 import React, { useEffect, useState } from "react";
+import * as Location from "expo-location";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { AppDispatch, RootState } from "../../store/store";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,32 +27,8 @@ import {
 import { setCurrentScreen } from "../../contexts/screenSlice";
 import { Picker } from "@react-native-picker/picker";
 import { updateUserData } from "../../services/firebase/securityScreen.services";
-
-const SafetyConfirmationPopup = ({
-  visible,
-  onConfirm,
-  onCancel,
-}: {
-  visible: boolean;
-  onConfirm: () => void;
-  onCancel: () => void;
-}) => (
-  <Modal transparent visible={visible} animationType="slide">
-    <View style={styles.overlay}>
-      <View style={styles.modalContainer}>
-        <Text style={styles.modalText}>Please confirm your safety</Text>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity onPress={onConfirm} style={styles.modalButton}>
-            <Text style={styles.buttonText}>I'm Safe</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={onCancel} style={styles.modalButton}>
-            <Text style={styles.buttonText}>I'm Not Safe</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
-  </Modal>
-);
+import { sendSmsWithLocation } from "../../utils/notifications.utils";
+import { TEST_NUMBER } from "@env";
 
 const SecurityTimerScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -60,23 +38,25 @@ const SecurityTimerScreen: React.FC = () => {
   const SafetyTimerContacts = useSelector(
     (state: RootState) => state.securityFeature.safetyTimerContacts
   );
+  const uid = useSelector((state: RootState) => state.appUser.user?.uid);
+  const username = useSelector((state: RootState) => state.appUser.user?.name);
 
   const [loading, setLoading] = useState(false);
   const [isChanged, setIsChanged] = useState(false);
   const [hours, setHours] = useState<number>(safetyTimerInterval[0]);
   const [minutes, setMinutes] = useState<number>(safetyTimerInterval[1]);
   const [popupVisible, setPopupVisible] = useState<boolean>(false);
-
   const [contacts, setContacts] = useState<string[]>(() => {
     const updatedContacts = [...SafetyTimerContacts];
     while (updatedContacts.length < 3) updatedContacts.push("");
     return updatedContacts;
   });
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const backAction = () => {
-      dispatch(setCurrentScreen("security"));
       dispatch(setCurrentFeature("features"));
+      dispatch(setCurrentScreen("security"));
       return true;
     };
 
@@ -96,23 +76,48 @@ const SecurityTimerScreen: React.FC = () => {
     return true;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (validateTime()) {
-      dispatch(updateSafetyTimerTimeInterval([hours, minutes]));
+      setLoading(true);
+      const contactPresent = contacts.some((contact) => contact.length > 0);
+      if (!contactPresent) {
+        Alert.alert("Warning", "You need to add at least one contact");
+        setLoading(false);
+        return;
+      }
+      try {
+        dispatch(updateSafetyTimerTimeInterval([hours, minutes]));
+        updateUserData(uid || "User", {
+          SafetyTimerInterval: [hours, minutes],
+          SafetyTimerContacts: contacts,
+        })
+          .then(() => {
+            setIsChanged(false);
+            ToastAndroid.show(
+              `Timer set for ${hours} hours and ${minutes} minutes`,
+              ToastAndroid.SHORT
+            );
 
-      Alert.alert(
-        "Settings Saved",
-        `Timer set for ${hours} hours and ${minutes} minutes.}`
-      );
-
-      setTimeout(
-        () => {
-          setPopupVisible(true); // Show popup when timer expires
-        },
-        (hours * 60 + minutes) * 60 * 1000
-      );
+            // const timerDuration = (hours * 60 + minutes) * 60 * 1000;
+            const timerDuration = 10000;
+            setTimeout(() => {
+              setPopupVisible(true);
+              Vibration.vibrate(2000);
+              startPopupTimeout();
+            }, timerDuration);
+          })
+          .catch((error) => {
+            Alert.alert("Connection Error", "Sorry For The Inconvenience.");
+          });
+      } catch (error) {
+        console.error("Error saving data:", error);
+        Alert.alert("Error", "Failed to save data.");
+      } finally {
+        setLoading(false);
+      }
     }
   };
+
   const handleContactChange = (index: number, text: string) => {
     const updatedContacts = [...contacts];
     updatedContacts[index] = text;
@@ -123,18 +128,81 @@ const SecurityTimerScreen: React.FC = () => {
     );
   };
 
+  const startPopupTimeout = () => {
+    const id = setTimeout(
+      () => {
+        handleNotSafeAction();
+      },
+      5000
+    ); 
+    setTimeoutId(id);
+  };
+
+  const clearPopupTimeout = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      setTimeoutId(null);
+    }
+  };
+
   const handleSafeAction = () => {
     setPopupVisible(false);
-    // Additional logic if needed
+    clearPopupTimeout();
+    Alert.alert("Thank you", "Glad to know you're safe!");
   };
 
   const handleNotSafeAction = () => {
-    Alert.alert(
-      "Emergency Alert",
-      "Your location has been sent to your emergency contacts."
-    );
     setPopupVisible(false);
-    // Add logic to send SMS to contacts here
+    clearPopupTimeout();
+
+    ToastAndroid.showWithGravity(
+      "Safety was not ensured in time. Sending location to selected contacts",
+      ToastAndroid.BOTTOM,
+      ToastAndroid.LONG
+    );
+
+    Location.requestForegroundPermissionsAsync()
+      .then(({ status }) => {
+        if (status !== "granted") {
+          Alert.alert(
+            "Location Permission Denied",
+            "Please enable location services to use the SOS feature."
+          );
+          return Promise.reject("Location permission denied"); 
+        }
+
+        return Location.getCurrentPositionAsync({}); 
+      })
+      .then((location) => {
+        const locationLink = `https://maps.google.com/?q=${location.coords.latitude},${location.coords.longitude}`;
+
+        // Actual API Call (loop through contacts if necessary)
+        // SOSButtonContacts.forEach((contact) => {
+        //   sendSmsWithLocation(contact, username || "User", locationLink)
+        //     .then(() => {
+        //       console.log(`SMS sent to ${contact}`);
+        //     })
+        //     .catch((error) => {
+        //       console.error(`Error sending SMS to ${contact}:`, error);
+        //     });
+        // });
+
+        sendSmsWithLocation(
+          TEST_NUMBER,
+          username || "User",
+          locationLink,
+          "sos"
+        ).then(() => {
+          console.log("SMS sent");
+        });
+      })
+      .catch((error) => {
+        console.error("Error during SOS action:", error);
+        Alert.alert("Location Error", "Failed to get current location.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   return (
@@ -146,13 +214,11 @@ const SecurityTimerScreen: React.FC = () => {
           This feature allows you to set a custom time interval, after which
           you'll receive a prompt to confirm your safety. If you don’t respond
           within the given time, your current location will automatically be
-          shared with your selected emergency contacts.{" "}
+          shared with your selected emergency contacts.
         </Text>
-
-        {/* Image below description */}
         <Image
           source={{
-            uri: "https://res.cloudinary.com/desa0upux/image/upload/v1731178507/dwnplkw7sjrrxwgcehv5.png", // Replace with your actual image link
+            uri: "https://res.cloudinary.com/desa0upux/image/upload/v1731257790/qfovp4xpwbyugzbgh5tr.png",
           }}
           style={styles.infoImage}
         />
@@ -184,8 +250,9 @@ const SecurityTimerScreen: React.FC = () => {
       </View>
 
       <View style={styles.contactInputContainer}>
-        <Text style={styles.contactTitle}>Enter Emergency Contacts</Text>
+        <Text style={styles.contactTitle}>Enter Safety Timer Contacts</Text>
 
+        {/* Always show 3 contact inputs */}
         {contacts.map((contact, index) => (
           <View key={index} style={styles.contactRow}>
             <View style={styles.inputWrapper}>
@@ -218,10 +285,33 @@ const SecurityTimerScreen: React.FC = () => {
           {loading ? (
             <ActivityIndicator color="#FFFFFF" />
           ) : (
-            <Text style={styles.buttonText}>Save</Text>
+            <Text style={styles.buttonText}>Start Safety Timer</Text>
           )}
         </TouchableOpacity>
       </View>
+
+      {/* Popup Modal */}
+      <Modal visible={popupVisible} transparent animationType="slide">
+        <View style={styles.overlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalText}>Are you safe?</Text>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={handleSafeAction}
+              >
+                <Text style={{ color: "#fff" }}>I'm Safe</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={handleNotSafeAction}
+              >
+                <Text style={{ color: "#fff" }}>I'm Not Safe</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };

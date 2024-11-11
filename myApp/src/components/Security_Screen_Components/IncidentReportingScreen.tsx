@@ -19,6 +19,7 @@ import { Formik } from "formik";
 import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
 import { saveIncidentReport } from "../../services/firebase/securityScreen.services";
+import { setCurrentScreen } from "../../contexts/screenSlice";
 
 const incidentReportingSchema = Yup.object().shape({
   name: Yup.string(),
@@ -37,6 +38,7 @@ const IncidentReportingScreen = () => {
   useEffect(() => {
     const backAction = () => {
       dispatch(setCurrentFeature("features"));
+      dispatch(setCurrentScreen("security"));
       return true;
     };
 
@@ -85,6 +87,7 @@ const IncidentReportingScreen = () => {
         contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
       >
+        <Text style={styles.heading}>Incident Reporting</Text>
         <View style={styles.incidentReportingMainContainer}>
           <Text style={styles.infoText}>
             Quickly seek help from government authorities or support
@@ -201,6 +204,13 @@ const IncidentReportingScreen = () => {
 export default IncidentReportingScreen;
 
 const styles = StyleSheet.create({
+  heading: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
+    color: "#7A4791",
+  },
   container: {
     flex: 1,
     borderRadius: 10,

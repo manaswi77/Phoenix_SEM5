@@ -73,7 +73,12 @@ const InfoScreen: React.FC = () => {
         //     });
         // });
 
-        sendSmsWithLocation(TEST_NUMBER, username || "User", locationLink)
+        sendSmsWithLocation(
+          TEST_NUMBER,
+          username || "User",
+          locationLink,
+          "sos"
+        )
           .then(() => {
             console.log("SMS sent to test number");
           })

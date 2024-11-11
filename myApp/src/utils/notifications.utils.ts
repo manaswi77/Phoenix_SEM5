@@ -3,12 +3,18 @@ import { BACKEND_URL } from "@env";
 const sendSmsWithLocation = async (
   phoneNumber: string,
   username: string,
-  location: string
+  location: string,
+  type: string
 ) => {
   try {
-    const message = `Urgent: An SOS alert has been triggered by ${username}. Please find the emergency location here: ${location}. Kindly reach out immediately to assist.`;
-    console.log("Sending SMS:", message);
-    const msg = "Hello Angry Bird 😁";
+    const SOSMessage = `Urgent: An SOS alert has been triggered by ${username}. Please find the emergency location here: ${location}. Kindly reach out immediately to assist.`;
+    const SafetyTimerMessage = `Safety was not confirmed within the set timer by ${username}. The current location is: ${location}. Please take immediate action to ensure their safety.`;
+
+    console.log(
+      "Sending SMS:",
+      type === "sos" ? SOSMessage : SafetyTimerMessage
+    );
+    const msg = "Safety Timer Working";
 
     const response = await fetch(`${BACKEND_URL}/send-sms`, {
       method: "POST",

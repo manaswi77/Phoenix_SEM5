@@ -39,8 +39,8 @@ const SOSButtonScreen = () => {
 
   useEffect(() => {
     const backAction = () => {
-      dispatch(setCurrentScreen("security"));
       dispatch(setCurrentFeature("features"));
+      dispatch(setCurrentScreen("security"));
       return true;
     };
 
@@ -96,7 +96,7 @@ const SOSButtonScreen = () => {
         {/* Image below description */}
         <Image
           source={{
-            uri: "https://res.cloudinary.com/desa0upux/image/upload/v1731178507/dwnplkw7sjrrxwgcehv5.png", // Replace with your actual image link
+            uri: "https://res.cloudinary.com/desa0upux/image/upload/v1731178507/dwnplkw7sjrrxwgcehv5.png", 
           }}
           style={styles.infoImage}
         />
