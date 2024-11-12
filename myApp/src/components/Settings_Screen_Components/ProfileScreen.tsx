@@ -27,9 +27,9 @@ const menuItems: MenuItem[] = [
 ];
 
 const ProfileScreen: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<
-    "Information" | "Your Posts" | "Saved Posts"
-  >("Information");
+  const [activeTab, setActiveTab] = useState<"Information" | "Saved Posts">(
+    "Information"
+  );
 
   const user = useSelector((state: RootState) => state.appUser.user);
   const [username, setUsername] = useState<string | undefined>(user?.name);
@@ -77,20 +77,14 @@ const ProfileScreen: React.FC = () => {
           <Text style={styles.userName}>{username || "User"}</Text>
         </View>
         <View style={styles.tabContainer}>
-          {["Information", "Your Posts", "Saved Posts"].map((tab) => (
+          {["Information", "Saved Posts"].map((tab) => (
             <TouchableOpacity
               key={tab}
               style={[styles.tab, activeTab === tab && styles.activeTab]}
               onPress={() => setActiveTab(tab as typeof activeTab)}
             >
               <Feather
-                name={
-                  tab === "Information"
-                    ? "user"
-                    : tab === "Your Posts"
-                      ? "file-text"
-                      : "bookmark"
-                }
+                name={tab === "Information" ? "user" : "bookmark"}
                 size={20}
                 color={activeTab === tab ? "#6200ee" : "#757575"}
               />

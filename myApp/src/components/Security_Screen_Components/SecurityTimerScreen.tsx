@@ -102,7 +102,7 @@ const SecurityTimerScreen: React.FC = () => {
             const timerDuration = 10000;
             setTimeout(() => {
               setPopupVisible(true);
-              Vibration.vibrate(2000);
+              Vibration.vibrate(5000);
               startPopupTimeout();
             }, timerDuration);
           })
@@ -133,8 +133,8 @@ const SecurityTimerScreen: React.FC = () => {
       () => {
         handleNotSafeAction();
       },
-      5000
-    ); 
+      2 * 60 * 1000
+    );
     setTimeoutId(id);
   };
 
@@ -168,10 +168,10 @@ const SecurityTimerScreen: React.FC = () => {
             "Location Permission Denied",
             "Please enable location services to use the SOS feature."
           );
-          return Promise.reject("Location permission denied"); 
+          return Promise.reject("Location permission denied");
         }
 
-        return Location.getCurrentPositionAsync({}); 
+        return Location.getCurrentPositionAsync({});
       })
       .then((location) => {
         const locationLink = `https://maps.google.com/?q=${location.coords.latitude},${location.coords.longitude}`;
@@ -268,7 +268,7 @@ const SecurityTimerScreen: React.FC = () => {
                   onPress={() => handleContactChange(index, "")}
                   style={styles.iconContainer}
                 >
-                  <AntDesign name="edit" size={20} color="#7A4791" />
+                  <AntDesign name="delete" size={20} color="red" />
                 </TouchableOpacity>
               ) : null}
             </View>

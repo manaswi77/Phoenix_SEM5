@@ -8,7 +8,8 @@ const sendSmsWithLocation = async (
 ) => {
   try {
     const SOSMessage = `Urgent: An SOS alert has been triggered by ${username}. Please find the emergency location here: ${location}. Kindly reach out immediately to assist.`;
-    const SafetyTimerMessage = `Safety was not confirmed within the set timer by ${username}. The current location is: ${location}. Please take immediate action to ensure their safety.`;
+    const SafetyTimerMessage = `Safety was not confirmed within the set timer by ${username}. The current location is: ${location}. Please take appropriate action to ensure their safety.`; 1
+    const EmergencyMessage = `Urgent: Regarding SOS alert has been triggered by ${username}. Current location is: ${location}`;
 
     console.log(
       "Sending SMS:",

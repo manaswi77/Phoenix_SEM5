@@ -9,7 +9,8 @@ export type ScreenState =
   | "security"
   | "home"
   | "community"
-  | "settings";
+  | "settings"
+  | "emergency";
 
 export type ForgotPasswordStage = "mail" | "otp" | "changed" | "successful";
 

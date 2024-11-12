@@ -11,11 +11,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { setCurrentScreen } from "../contexts/screenSlice";
 import { RootState, AppDispatch } from "../store/store";
 import { ScreenState } from "../types/types";
-import SecurityIcon from "../../assets/SecurityIcon";
-import ChatbotIcon from "../../assets/ChatbotIcon";
-import HomeIcon from "../../assets/HomeIcon";
-import CommunityIcon from "../../assets/CommunityIcon";
-import SettingsIcon from "../../assets/SettingsIcon";
+import SecurityIcon from "../../assets/Icons/SecurityIcon";
+import ChatbotIcon from "../../assets/Icons/ChatbotIcon";
+import HomeIcon from "../../assets/Icons/HomeIcon";
+import CommunityIcon from "../../assets/Icons/CommunityIcon";
+import SettingsIcon from "../../assets/Icons/SettingsIcon";
+import { setCurrentFeature } from "../contexts/securityFeatureSlice";
 
 const { width } = Dimensions.get("window");
 const TAB_WIDTH = width / 5;
@@ -44,7 +45,7 @@ const navItems: NavItem[] = [
   },
   {
     id: "community",
-    icon: CommunityIcon as React.FC<{ size: number; color: string; }>,
+    icon: CommunityIcon as React.FC<{ size: number; color: string }>,
     label: "Community",
   },
   {
@@ -59,11 +60,12 @@ const BottomNavigation: React.FC = () => {
   const currentScreen = useSelector(
     (state: RootState) => state.screen.currentScreen
   );
-  const [topBarVisible, setTopBarVisible] = React.useState(false);
 
   const handlePress = (screen: ScreenState) => {
     dispatch(setCurrentScreen(screen));
-    setTopBarVisible(true);
+    if (screen === "security") {
+      dispatch(setCurrentFeature("features"));
+    }
   };
 
   const getIconColor = (screenId: ScreenState) => {

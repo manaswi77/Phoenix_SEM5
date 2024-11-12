@@ -121,7 +121,7 @@ const SOSButtonScreen = () => {
                   onPress={() => handleContactChange(index, "")}
                   style={styles.iconContainer}
                 >
-                  <AntDesign name="edit" size={20} color="#7A4791" />
+                  <AntDesign name="delete" size={20} color="red" />
                 </TouchableOpacity>
               ) : null}
             </View>

@@ -22,4 +22,5 @@ declare module "@env" {
   export const API_SECRET_CLOUDINARY: string;
   export const TEST_NUMBER: string;
   export const BACKEND_URL: string;
+  export const RAKSHITA_SERVER: string;
 }

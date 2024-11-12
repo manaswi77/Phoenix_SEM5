@@ -8,6 +8,7 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { AppDispatch } from "../../store/store";
@@ -34,6 +35,7 @@ const incidentReportingSchema = Yup.object().shape({
 const IncidentReportingScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [image, setImage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const backAction = () => {
@@ -71,6 +73,7 @@ const IncidentReportingScreen = () => {
   };
 
   const handleSubmit = async (values: IncidentReportingFormValues) => {
+    setLoading(true);
     try {
       // const imageUrl = image ? await uploadImage(image, `${Date.now()}`) : "";
       const imageUrl = "";
@@ -78,6 +81,8 @@ const IncidentReportingScreen = () => {
       Alert.alert("Report Submitted", "Your incident report has been saved.");
     } catch (error) {
       Alert.alert("Error", "An error occurred while submitting the report.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -96,6 +101,12 @@ const IncidentReportingScreen = () => {
             images, location, and a description of the incident, to ensure
             timely and effective assistance.
           </Text>
+          <Image
+            source={{
+              uri: "https://res.cloudinary.com/desa0upux/image/upload/v1731348281/a7ftxljaq4ubsbbk4a9l.png",
+            }}
+            style={styles.infoImage}
+          />
         </View>
         <View style={styles.incidentReportingMainContainer}>
           <Formik
@@ -190,7 +201,11 @@ const IncidentReportingScreen = () => {
                   style={styles.submitButton}
                   onPress={() => handleSubmit()}
                 >
-                  <Text style={styles.submitButtonText}>Submit Report</Text>
+                  {loading ? (
+                    <ActivityIndicator color="#FFFFFF" />
+                  ) : (
+                    <Text style={styles.submitButtonText}>Submit Report</Text>
+                  )}
                 </TouchableOpacity>
               </>
             )}
@@ -221,7 +236,7 @@ const styles = StyleSheet.create({
   },
   incidentReportingMainContainer: {
     padding: 20,
-    backgroundColor: "#f2d7f7",
+    backgroundColor: "#f0eff4",
     borderRadius: 10,
     margin: 10,
     borderColor: "#ddd",
@@ -235,6 +250,13 @@ const styles = StyleSheet.create({
   infoText: {
     fontSize: 16,
     color: "#333",
+  },
+  infoImage: {
+    width: "100%",
+    height: 200,
+    resizeMode: "contain",
+    borderRadius: 10,
+    marginTop: 10,
   },
   uploadButton: {
     backgroundColor: "#9067c6",

@@ -53,12 +53,14 @@ const getSafetyTimerInformation = async (userId: string) => {
 
 const saveSOSButtonReport = async (
   data: SOSButtonReportInfomation
-): Promise<string> => {
+): Promise<{ reportId: string }> => {
   try {
     const sosButtonReportsRef = collection(firestore, "sosButtonReports");
     const docRef = await addDoc(sosButtonReportsRef, data);
     console.log("SOS button report saved successfully!", docRef.id);
-    return docRef.id;
+    return {
+      reportId: docRef.id,
+    };
   } catch (error) {
     console.error("Error saving SOS button report:", error);
     throw error;
@@ -112,5 +114,5 @@ export {
   saveSOSButtonReport,
   saveIncidentReport,
   saveSafetyTimerReport,
-  updateUserData
+  updateUserData,
 };

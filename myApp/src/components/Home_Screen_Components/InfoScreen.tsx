@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import * as Location from "expo-location";
+import io from "socket.io-client";
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch } from "../../store/store";
 import { RootState } from "../../store/store";
@@ -21,9 +22,11 @@ import AppData from "../../../assets/AppAssets.json";
 import { saveSOSButtonReport } from "../../services/firebase/securityScreen.services";
 import { SOSButtonReportInfomation } from "../../types/types";
 import { sendSmsWithLocation } from "../../utils/notifications.utils";
-import { TEST_NUMBER } from "@env";
+import { TEST_NUMBER, RAKSHITA_SERVER } from "@env";
+import { setCurrentScreen } from "../../contexts/screenSlice";
 
 const { width, height } = Dimensions.get("window");
+const socket = io(RAKSHITA_SERVER);
 
 const InfoScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -60,19 +63,12 @@ const InfoScreen: React.FC = () => {
           location: locationLink,
         };
 
-        await saveSOSButtonReport(SOSButtonReport);
+        const { reportId } = await saveSOSButtonReport(SOSButtonReport);
 
-        // Actual API Call
-        // SOSButtonContacts.forEach((contact) => {
-        //   sendSmsWithLocation(contact, username || "User", locationLink)
-        //     .then(() => {
-        //       console.log(`SMS sent to ${contact}`);
-        //     })
-        //     .catch((error) => {
-        //       console.error(`Error sending SMS to ${contact}:`, error);
-        //     });
-        // });
+        // 1. Emit SOS
+        socket.emit("sos", { reportId });
 
+        // 2. SMS Functionality
         sendSmsWithLocation(
           TEST_NUMBER,
           username || "User",
@@ -87,10 +83,14 @@ const InfoScreen: React.FC = () => {
           });
 
         ToastAndroid.showWithGravity(
-          "Report Saved Successfully! Contacting nearby Nirbhaya Squad",
+          "Your report has been successfully submitted! Help is on the way and will arrive shortly. We are now moving to the next screen for further assistance.",
           ToastAndroid.LONG,
           ToastAndroid.BOTTOM
         );
+
+        setTimeout(() => {
+          dispatch(setCurrentScreen("emergency"));
+        }, 5000);
       })
       .catch((error) => {
         console.error("Error handling emergency:", error);
