@@ -9,10 +9,12 @@ import {
   Dimensions,
   BackHandler,
   StatusBar,
+  ActivityIndicator,
 } from "react-native";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store/store";
 import { setCurrentScreen } from "../../contexts/screenSlice";
+import { useFonts } from "expo-font";
 
 const { width, height } = Dimensions.get("window");
 
@@ -25,7 +27,7 @@ interface OnboardingItem {
 
 const onboardingData: OnboardingItem[] = [
   {
-    title: "Experience Improved Safety and Stronger Community Support.",
+    title: "Experience Improved Safety and Stronger Community Support",
     description:
       "With Rakshita, safeguarded by the Nirbhaya Squad, receive prompt assistance during emergencies. Enjoy enhanced safety features like incident reporting and a personalized safety timer to ensure your protection at all times.",
     image:
@@ -33,7 +35,7 @@ const onboardingData: OnboardingItem[] = [
     backgroundColor: "#f0eff4",
   },
   {
-    title: "Receive Support from a Vibrant and Engaged Community.",
+    title: "Receive Support from a Vibrant and Engaged Community",
     description:
       "With the Community feature, you'll receive timely updates on schemes, incentives for women, and various opportunities focused on overall well-being.",
     image:
@@ -53,6 +55,12 @@ const onboardingData: OnboardingItem[] = [
 const OnboardingScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  const [fontsLoaded] = useFonts({
+    Kanit_Medium: require("../../../assets/Fonts/Kanit-Medium.ttf"),
+    Tajawal_Regular: require("../../../assets/Fonts/Tajawal-Regular.ttf"),
+    Oxygen_Regular: require("../../../assets/Fonts/Oxygen-Regular.ttf"),
+  });
 
   useEffect(() => {
     const backAction = () => {
@@ -84,6 +92,10 @@ const OnboardingScreen: React.FC = () => {
   };
 
   const currentItem = onboardingData[currentIndex];
+
+  if (!fontsLoaded) {
+    return <ActivityIndicator size="large" color="#9067c6" />;
+  }
 
   return (
     <SafeAreaView
@@ -157,16 +169,17 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: "bold",
     textAlign: "center",
     marginBottom: 10,
     color: "#333",
+    fontFamily: "Kanit_Medium",
   },
   description: {
     fontSize: 16,
     textAlign: "center",
     marginBottom: 30,
     color: "#666",
+    fontFamily: "Tajawal_Regular",
   },
   nextButton: {
     backgroundColor: "#8A2BE2",
@@ -179,12 +192,13 @@ const styles = StyleSheet.create({
   nextButtonText: {
     color: "white",
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: "Oxygen_Regular",
   },
   skipText: {
     marginTop: 20,
     color: "#666",
     fontSize: 16,
+    fontFamily: "Oxygen_Regular",
   },
   paginationContainer: {
     flexDirection: "row",

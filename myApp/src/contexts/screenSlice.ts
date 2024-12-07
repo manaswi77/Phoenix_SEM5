@@ -4,12 +4,14 @@ import { ScreenState } from "../types/types";
 interface ScreenStateType {
   isLoggedIn: boolean;
   isEmergency: boolean;
+  isChatbot: boolean;
   currentScreen: ScreenState;
 }
 
 const initialState: ScreenStateType = {
   isLoggedIn: false,
   isEmergency: false,
+  isChatbot: false,
   currentScreen: "onboarding",
 };
 
@@ -26,9 +28,16 @@ const screenSlice = createSlice({
     setEmergencyState(state, action: PayloadAction<boolean>) {
       state.isEmergency = action.payload;
     },
+    setChatBotScreenState(state, action: PayloadAction<boolean>) {
+      state.isChatbot = action.payload;
+    },
   },
 });
 
-export const { setIsLoggedIn, setCurrentScreen, setEmergencyState } =
-  screenSlice.actions;
+export const {
+  setIsLoggedIn,
+  setCurrentScreen,
+  setEmergencyState,
+  setChatBotScreenState,
+} = screenSlice.actions;
 export default screenSlice.reducer;

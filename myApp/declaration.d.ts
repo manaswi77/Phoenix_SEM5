@@ -25,4 +25,6 @@ declare module "@env" {
   export const BACKEND_URL: string;
   export const RAKSHITA_SERVER: string;
   export const GEMINI_API_KEY: string;
+  export const PRESET_NAME: string;
+  export const CLOUD_NAME: string;
 }

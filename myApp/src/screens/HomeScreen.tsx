@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { View, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, Keyboard } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import WelcomeScreen from "../components/Home_Screen_Components/WelcomeScreen";
 import LoginScreen from "../components/Home_Screen_Components/LoginScreen";
@@ -25,9 +25,12 @@ const HomeScreen: React.FC = () => {
   const isEmergency = useSelector(
     (state: RootState) => state.screen.isEmergency
   );
+  const isChatbot = useSelector((state: RootState) => state.screen.isChatbot);
   const currentScreen = useSelector(
     (state: RootState) => state.screen.currentScreen
   );
+
+  const [iseKeyboardVisible, setIsKeyboardVisible] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchUserSession = async () => {
@@ -40,6 +43,21 @@ const HomeScreen: React.FC = () => {
     };
 
     fetchUserSession();
+  }, []);
+
+  useEffect(() => {
+    const keyboardShowListener = Keyboard.addListener("keyboardDidShow", () =>
+      setIsKeyboardVisible(true)
+    );
+
+    const keyboardHideListener = Keyboard.addListener("keyboardDidHide", () =>
+      setIsKeyboardVisible(false)
+    );
+
+    return () => {
+      keyboardShowListener.remove();
+      keyboardHideListener.remove();
+    };
   }, []);
 
   const renderScreen = () => {
@@ -74,7 +92,9 @@ const HomeScreen: React.FC = () => {
   return (
     <View style={styles.mainContainer}>
       {renderScreen()}
-      {isLoggedIn && !isEmergency && <BottomNavigation />}
+      {isLoggedIn && !isEmergency && !iseKeyboardVisible && !isChatbot && (
+        <BottomNavigation />
+      )}
     </View>
   );
 };

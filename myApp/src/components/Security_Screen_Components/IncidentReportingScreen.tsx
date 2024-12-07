@@ -22,6 +22,7 @@ import { Picker } from "@react-native-picker/picker";
 import { saveIncidentReport } from "../../services/firebase/securityScreen.services";
 import { setCurrentScreen } from "../../contexts/screenSlice";
 import { useFonts } from "expo-font";
+import { uploadImageToCloudinary } from "../../utils/imageUpload.utils";
 
 const incidentReportingSchema = Yup.object().shape({
   name: Yup.string(),
@@ -69,9 +70,10 @@ const IncidentReportingScreen = () => {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ["images"],
       allowsEditing: true,
       quality: 1,
+      base64: true,
     });
 
     if (!result.canceled) {
@@ -82,8 +84,7 @@ const IncidentReportingScreen = () => {
   const handleSubmit = async (values: IncidentReportingFormValues) => {
     setLoading(true);
     try {
-      // const imageUrl = image ? await uploadImage(image, `${Date.now()}`) : "";
-      const imageUrl = "";
+      const imageUrl = image ? await uploadImageToCloudinary(image) : "";
       await saveIncidentReport({ ...values, imageUrl });
       Alert.alert("Report Submitted", "Your incident report has been saved.");
     } catch (error) {

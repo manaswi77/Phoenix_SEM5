@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, Text, BackHandler, StyleSheet } from "react-native";
+import { View, BackHandler, StyleSheet } from "react-native";
 import { AppDispatch } from "../store/store";
 import { useDispatch } from "react-redux";
 import { setCurrentScreen } from "../contexts/screenSlice";
@@ -33,11 +33,11 @@ const SettingsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   header: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     padding: 16,
   },
 });

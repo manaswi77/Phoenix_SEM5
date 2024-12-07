@@ -5,6 +5,7 @@ import {
   View,
   TextInput,
   TouchableOpacity,
+  Keyboard,
   Alert,
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -18,6 +19,7 @@ import { AppDispatch } from "../../../store/store";
 import { setCurrentScreen } from "../../../contexts/screenSlice";
 import { auth } from "../../../config/firebase.config";
 import { sendPasswordResetEmail } from "firebase/auth";
+import { useFonts } from "expo-font";
 
 const ForgotPasswordSchema = Yup.object().shape({
   email: Yup.string()
@@ -28,6 +30,12 @@ const ForgotPasswordSchema = Yup.object().shape({
 const MailForPassWord = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [loading, setLoading] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  const [fontsLoaded] = useFonts({
+    Faculty_Glyphic: require("../../../../assets/Fonts/FacultyGlyphic-Regular.ttf"),
+    Oxygen_Regular: require("../../../../assets/Fonts/Oxygen-Regular.ttf"),
+  });
 
   useEffect(() => {
     const backAction = () => {
@@ -42,6 +50,20 @@ const MailForPassWord = () => {
 
     return () => backHandler.remove();
   }, [dispatch]);
+
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+      setKeyboardVisible(true);
+    });
+    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardVisible(false);
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
 
   const handleForgotPassword = (values: { email: string }) => {
     setLoading(true);
@@ -75,9 +97,12 @@ const MailForPassWord = () => {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <View style={styles.mailContainer}>
+      <View
+        style={[styles.mailContainer, keyboardVisible && { paddingTop: 310 }]}
+      >
         <Text style={styles.forgotPassText}>Forgot Password ?</Text>
 
         <Text style={styles.infoText}>
@@ -119,7 +144,7 @@ const MailForPassWord = () => {
                 {loading ? (
                   <ActivityIndicator color="#FFFFFF" />
                 ) : (
-                  <Text style={styles.sendCodeButtonText}>Send Code</Text>
+                  <Text style={styles.sendCodeButtonText}>Send Mail</Text>
                 )}
               </TouchableOpacity>
             </>
@@ -138,8 +163,8 @@ const styles = StyleSheet.create({
   },
   forgotPassText: {
     fontSize: 24,
-    fontWeight: "bold",
     marginBottom: 7,
+    fontFamily: "Faculty_Glyphic",
   },
   enterEmailInput: {
     borderColor: "#AE81D9",
@@ -147,16 +172,18 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     marginBottom: 9,
     padding: 10,
+    fontFamily: "Oxygen_Regular",
   },
   errorText: {
     color: "red",
     fontSize: 12,
     marginBottom: 10,
     textAlign: "left",
+    fontFamily: "Oxygen_Regular",
   },
   sendCodebutton: {
     marginTop: 15,
-    backgroundColor: "#7A4791",
+    backgroundColor: "#9067c6",
     padding: 14,
     borderRadius: 5,
     alignItems: "center",
@@ -164,7 +191,7 @@ const styles = StyleSheet.create({
   },
   sendCodeButtonText: {
     color: "#FFFFFF",
-    fontWeight: "bold",
+    fontFamily: "Oxygen_Regular",
     fontSize: 16,
   },
   infoText: {
@@ -172,6 +199,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#6C757D",
     marginBottom: 20,
+    fontFamily: "Oxygen_Regular",
   },
 });
 

@@ -9,7 +9,10 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { setCurrentScreen } from "../contexts/screenSlice";
+import {
+  setChatBotScreenState,
+  setCurrentScreen,
+} from "../contexts/screenSlice";
 import { RootState, AppDispatch } from "../store/store";
 import { ScreenState } from "../types/types";
 import SecurityIcon from "../../assets/Icons/SecurityIcon";
@@ -71,6 +74,8 @@ const BottomNavigation: React.FC = () => {
     dispatch(setCurrentScreen(screen));
     if (screen === "security") {
       dispatch(setCurrentFeature("features"));
+    } else if (screen === "chatbot") {
+      dispatch(setChatBotScreenState(true));
     }
   };
 
