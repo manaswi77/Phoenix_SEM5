@@ -22,8 +22,12 @@ import AppData from "../../../assets/AppAssets.json";
 import { saveSOSButtonReport } from "../../services/firebase/securityScreen.services";
 import { SOSButtonReportInfomation } from "../../types/types";
 import { sendSmsWithLocation } from "../../utils/notifications.utils";
-import { TEST_NUMBER, RAKSHITA_SERVER } from "@env";
-import { setCurrentScreen } from "../../contexts/screenSlice";
+import { TEST_NUMBER, TEST_NUMBER2, RAKSHITA_SERVER } from "@env";
+import {
+  setCurrentScreen,
+  setEmergencyState,
+} from "../../contexts/screenSlice";
+import { useFonts } from "expo-font";
 
 const { width, height } = Dimensions.get("window");
 const socket = io(RAKSHITA_SERVER);
@@ -36,6 +40,15 @@ const InfoScreen: React.FC = () => {
     (state: RootState) => state.securityFeature.SOSButtonContacts
   );
   const [loading, setLoading] = useState(false);
+
+  const [fontsLoaded] = useFonts({
+    Rowdies_Bold: require("../../../assets/Fonts/Rowdies-Bold.ttf"),
+    Tajawal_Regular: require("../../../assets/Fonts/Tajawal-Regular.ttf"),
+    Tajawal_Medium: require("../../../assets/Fonts/Tajawal-Medium.ttf"),
+    Tajawal_Bold: require("../../../assets/Fonts/Tajawal-Bold.ttf"),
+    Oxygen_Regular: require("../../../assets/Fonts/Oxygen-Regular.ttf"),
+    Oxygen_Bold: require("../../../assets/Fonts/Oxygen-Bold.ttf"),
+  });
 
   const handleEmergency = () => {
     setLoading(true);
@@ -82,13 +95,27 @@ const InfoScreen: React.FC = () => {
             console.error("Error sending SMS to test number:", error);
           });
 
+        sendSmsWithLocation(
+          TEST_NUMBER2,
+          username || "User",
+          locationLink,
+          "sos"
+        )
+          .then(() => {
+            console.log("SMS sent to test number");
+          })
+          .catch((error) => {
+            console.error("Error sending SMS to test number:", error);
+          });
+
         ToastAndroid.showWithGravity(
-          "Your report has been successfully submitted! Help is on the way and will arrive shortly. We are now moving to the next screen for further assistance.",
+          "Moving to the next screen for further assistance.",
           ToastAndroid.LONG,
           ToastAndroid.BOTTOM
         );
 
         setTimeout(() => {
+          dispatch(setEmergencyState(true));
           dispatch(setCurrentScreen("emergency"));
         }, 5000);
       })
@@ -101,6 +128,10 @@ const InfoScreen: React.FC = () => {
       });
   };
 
+  if (!fontsLoaded) {
+    return <ActivityIndicator size="large" color="#9067c6" />;
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -110,7 +141,10 @@ const InfoScreen: React.FC = () => {
             <Text style={styles.welcomeText}>Welcome</Text>
             <Text style={styles.nameText}>{username || "User"}</Text>
           </View>
-          <TouchableOpacity style={styles.profileButton}>
+          <TouchableOpacity
+            style={styles.profileButton}
+            onPress={() => dispatch(setCurrentScreen("settings"))}
+          >
             <Feather name="user" size={24} color="#8A2BE2" />
           </TouchableOpacity>
         </View>
@@ -162,15 +196,15 @@ const styles = StyleSheet.create({
     marginBottom: height * 0.02,
   },
   welcomeText: {
-    fontSize: width * 0.035,
+    fontSize: width * 0.04,
     color: "#888",
-    fontWeight: "500",
+    fontFamily: "Tajawal_Regular",
   },
   nameText: {
     fontSize: width * 0.045,
-    fontWeight: "bold",
     color: "#333",
     marginTop: 4,
+    fontFamily: "Rowdies_Bold",
   },
   profileButton: {
     width: 48,
@@ -198,6 +232,7 @@ const styles = StyleSheet.create({
     fontSize: width * 0.035,
     color: "#333",
     marginRight: width * 0.04,
+    fontFamily: "Oxygen_Regular",
   },
   sosImage: {
     width: 150,
@@ -213,8 +248,8 @@ const styles = StyleSheet.create({
   },
   sosButtonText: {
     color: "#FFF",
-    fontWeight: "bold",
     fontSize: width * 0.04,
+    fontFamily: "Tajawal_Medium",
   },
 });
 

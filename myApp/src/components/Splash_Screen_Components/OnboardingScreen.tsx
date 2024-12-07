@@ -25,25 +25,28 @@ interface OnboardingItem {
 
 const onboardingData: OnboardingItem[] = [
   {
-    title: "Track your health activity with lofee",
+    title: "Experience Improved Safety and Stronger Community Support.",
     description:
-      "Lofee - your female health assistant helps you to track all calendar periods activity and give you suggestions",
-    image: "https://v0.dev/placeholder.svg?height=400&width=300&text=Woman+Sitting",
-    backgroundColor: "#E0FFFF",
+      "With Rakshita, safeguarded by the Nirbhaya Squad, receive prompt assistance during emergencies. Enjoy enhanced safety features like incident reporting and a personalized safety timer to ensure your protection at all times.",
+    image:
+      "https://res.cloudinary.com/desa0upux/image/upload/v1731435533/rn0gazdlrprzsoss5lbs.png",
+    backgroundColor: "#f0eff4",
   },
   {
-    title: "Read our articles for more experience",
+    title: "Receive Support from a Vibrant and Engaged Community.",
     description:
-      "Our articles cover your casual activities, like cooking, fashion style, health and more about women's interests",
-    image: "https://v0.dev/placeholder.svg?height=400&width=300&text=Reading+Articles",
-    backgroundColor: "#FFEFD5",
+      "With the Community feature, you'll receive timely updates on schemes, incentives for women, and various opportunities focused on overall well-being.",
+    image:
+      "https://res.cloudinary.com/desa0upux/image/upload/v1731435495/crtzipl9ty1rnifakne0.png",
+    backgroundColor: "#f0eff4",
   },
   {
-    title: "Consult with doctors about your health",
+    title: "A Personalized Mental Health Chatbot",
     description:
-      "Chat with doctors for health consultations, and even purchase medicines all within one app",
-    image: "https://v0.dev/placeholder.svg?height=400&width=300&text=Doctor+Consultation",
-    backgroundColor: "#FFF0F5",
+      " Designed to Provide Tailored Support and Guidance.Receive responses to all your queries, tailored to your emotions and needs.",
+    image:
+      "https://res.cloudinary.com/desa0upux/image/upload/v1731435476/pvsblpa25oduk95ux4mo.png",
+    backgroundColor: "#f0eff4",
   },
 ];
 
@@ -83,8 +86,16 @@ const OnboardingScreen: React.FC = () => {
   const currentItem = onboardingData[currentIndex];
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: currentItem.backgroundColor }]}>
-      <StatusBar backgroundColor={currentItem.backgroundColor} barStyle="dark-content" />
+    <SafeAreaView
+      style={[
+        styles.container,
+        { backgroundColor: currentItem.backgroundColor },
+      ]}
+    >
+      <StatusBar
+        backgroundColor={currentItem.backgroundColor}
+        barStyle="dark-content"
+      />
       <View style={styles.imageContainer}>
         <Image source={{ uri: currentItem.image }} style={styles.image} />
       </View>
@@ -93,7 +104,9 @@ const OnboardingScreen: React.FC = () => {
         <Text style={styles.description}>{currentItem.description}</Text>
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
           <Text style={styles.nextButtonText}>
-            {currentIndex === onboardingData.length - 1 ? "Get Started" : "Next"}
+            {currentIndex === onboardingData.length - 1
+              ? "Get Started"
+              : "Next"}
           </Text>
         </TouchableOpacity>
         {currentIndex < onboardingData.length - 1 && (
@@ -125,9 +138,9 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
   },
   image: {
     width: width * 0.8,
@@ -135,7 +148,7 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   contentContainer: {
-    width: '100%',
+    width: "100%",
     backgroundColor: "white",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
@@ -147,7 +160,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 10,
-    color: '#333',
+    color: "#333",
   },
   description: {
     fontSize: 16,
@@ -160,8 +173,8 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 40,
     borderRadius: 25,
-    width: '100%',
-    alignItems: 'center',
+    width: "100%",
+    alignItems: "center",
   },
   nextButtonText: {
     color: "white",
@@ -175,7 +188,7 @@ const styles = StyleSheet.create({
   },
   paginationContainer: {
     flexDirection: "row",
-    justifyContent: 'center',
+    justifyContent: "center",
     marginTop: 20,
   },
   paginationDot: {

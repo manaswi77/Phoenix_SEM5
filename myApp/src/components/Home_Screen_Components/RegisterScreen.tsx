@@ -21,6 +21,7 @@ import {
   getCurrentUserInfomation,
 } from "../../services/firebase/auth.services";
 import { setUser, setSession } from "../../contexts/userSlice";
+import { useFonts } from "expo-font";
 
 const RegisterSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
@@ -33,6 +34,12 @@ const RegisterSchema = Yup.object().shape({
 const RegisterScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [loading, setLoading] = useState(false);
+
+  const [fontsLoaded] = useFonts({
+    Faculty_Glyphic: require("../../../assets/Fonts/FacultyGlyphic-Regular.ttf"),
+    Oxygen_Regular: require("../../../assets/Fonts/Oxygen-Regular.ttf"),
+    Tajawal_Medium: require("../../../assets/Fonts/Tajawal-Medium.ttf"),
+  });
 
   const handleRegister = async (values: {
     email: string;
@@ -82,9 +89,13 @@ const RegisterScreen: React.FC = () => {
     }
   };
 
+  if (!fontsLoaded) {
+    return <ActivityIndicator size="large" color="#9067c6" />;
+  }
+
   return (
     <View style={styles.registerContainer}>
-      <Text style={styles.registerMessage}>Hello! Register to get started</Text>
+      <Text style={styles.registerMessage}>Hello! Register to Get Started</Text>
       <Formik
         initialValues={{
           email: "",
@@ -192,7 +203,9 @@ const RegisterScreen: React.FC = () => {
               </TouchableOpacity>
             </View>
             <View style={styles.accExists}>
-              <Text>Don't Have an Account ? </Text>
+              <Text style={styles.dontHaveAccountText}>
+                Don't Have an Account ?{" "}
+              </Text>
               <TouchableOpacity
                 onPress={() => dispatch(setCurrentScreen("login"))}
               >
@@ -217,9 +230,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
   },
+  dontHaveAccountText: {
+    fontFamily: "Oxygen_Regular",
+  },
   accExistsText: {
     color: "#9067c6",
-    fontWeight: "bold",
+    fontFamily: "Oxygen_Regular",
   },
   goToLoginBtn: {
     backgroundColor: "#9067c6",
@@ -237,10 +253,12 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     marginBottom: 12,
     padding: 10,
+    fontFamily: "Oxygen_Regular",
   },
   registerText: {
     color: "#FFFFFF",
     textAlign: "center",
+    fontFamily: "Oxygen_Regular",
   },
   registerButton: {
     marginTop: 17,
@@ -259,6 +277,7 @@ const styles = StyleSheet.create({
   registerMessage: {
     fontSize: 32,
     marginBottom: 10,
+    fontFamily: "Faculty_Glyphic",
   },
   line: {
     flex: 1,
@@ -276,10 +295,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 10,
     marginLeft: 10,
+    fontFamily: "Tajawal_Medium",
   },
   registerOptionstext: {
     marginHorizontal: 10,
     textAlign: "center",
+    fontFamily: "Oxygen_Regular",
   },
   registerOptionsContainer: {
     margin: 5,

@@ -1,6 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
 import screenReducer from "../contexts/screenSlice";
-import communityPostReducer from "../contexts/communityPostsSlice";
 import changePasswordReducer from "../contexts/changePasswordSlice";
 import securityScreenReducer from "../contexts/securityFeatureSlice";
 import userReducer from "../contexts/userSlice";
@@ -8,7 +7,6 @@ import userReducer from "../contexts/userSlice";
 export const store = configureStore({
   reducer: {
     screen: screenReducer,
-    communityPosts: communityPostReducer,
     changePassword: changePasswordReducer,
     securityFeature: securityScreenReducer,
     appUser: userReducer,

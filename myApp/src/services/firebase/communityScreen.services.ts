@@ -1,5 +1,7 @@
 import axios from "axios";
-import { LikeResponse, CommentResponse } from "../../types/types";
+import { firestore } from "../../config/firebase.config";
+import { collection, getDocs } from "firebase/firestore";
+import { LikeResponse, CommentResponse, PostType } from "../../types/types";
 
 export const likePost = async (
   postId: string,
@@ -19,4 +21,21 @@ export const commentOnPost = async (
     comment,
   });
   return response.data;
+};
+
+export const getAllPosts = async (): Promise<PostType[]> => {
+  const collectionRef = collection(firestore, "communityPost");
+  const response = await getDocs(collectionRef);
+
+  return response.docs.map((doc) => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      postedBy: data.postedBy || "",
+      title: data.title || "",
+      desc: data.desc || "",
+      category: data.category || "",
+      photoUrl: data.photoUrl || "",
+    };
+  });
 };

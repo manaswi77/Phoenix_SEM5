@@ -26,6 +26,7 @@ import {
   setSOSButtonContacts,
   setSafetyTimerContacts,
 } from "../../contexts/securityFeatureSlice";
+import { useFonts } from "expo-font";
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
@@ -38,6 +39,11 @@ const LoginSchema = Yup.object().shape({
 const LoginScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [loading, setLoading] = useState(false);
+
+  const [fontsLoaded] = useFonts({
+    Faculty_Glyphic: require("../../../assets/Fonts/FacultyGlyphic-Regular.ttf"),
+    Oxygen_Regular: require("../../../assets/Fonts/Oxygen-Regular.ttf"),
+  });
 
   const handleLogin = async (email: string, password: string) => {
     setLoading(true);
@@ -93,6 +99,10 @@ const LoginScreen: React.FC = () => {
       setLoading(false);
     }
   };
+
+  if (!fontsLoaded) {
+    return <ActivityIndicator size="large" color="#9067c6" />;
+  }
 
   return (
     <View style={styles.loginContainer}>
@@ -183,7 +193,7 @@ const LoginScreen: React.FC = () => {
               </TouchableOpacity>
             </View>
             <View style={styles.noAccountContainer}>
-              <Text>Don't Have an Account ? </Text>
+              <Text style={styles.noAccountText}>Don't Have an Account ? </Text>
               <TouchableOpacity
                 onPress={() => dispatch(setCurrentScreen("register"))}
               >
@@ -206,6 +216,7 @@ const styles = StyleSheet.create({
   loginMessage: {
     fontSize: 35,
     marginBottom: 40,
+    fontFamily: "Faculty_Glyphic",
   },
   loginMailInput: {
     borderColor: "#9067c6",
@@ -213,10 +224,11 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     marginBottom: 9,
     padding: 10,
+    fontFamily: "Oxygen_Regular",
   },
   registerNowText: {
     color: "#9067c6",
-    fontWeight: "bold",
+    fontFamily: "Oxygen_Regular",
   },
   loginPasswordInput: {
     borderColor: "#9067c6",
@@ -224,10 +236,12 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     marginBottom: 9,
     padding: 10,
+    fontFamily: "Oxygen_Regular",
   },
   loginOptionsText: {
     marginHorizontal: 10,
     textAlign: "center",
+    fontFamily: "Oxygen_Regular",
   },
   loginOptionImage: {
     height: 55,
@@ -250,10 +264,12 @@ const styles = StyleSheet.create({
   loginText: {
     color: "#FFFFFF",
     textAlign: "center",
+    fontFamily: "Oxygen_Regular",
   },
   forgotPassword: {
     textAlign: "right",
     marginBottom: 10,
+    fontFamily: "Oxygen_Regular",
   },
   noAccountContainer: {
     marginTop: 15,
@@ -276,6 +292,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 10,
     marginLeft: 10,
+    fontFamily: "Tajawal_Medium",
+  },
+  noAccountText: {
+    fontFamily: "Oxygen_Regular",
   },
 });
 

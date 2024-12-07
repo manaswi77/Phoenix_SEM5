@@ -12,6 +12,7 @@ import {
   Image,
 } from "react-native";
 import React, { useEffect, useState } from "react";
+import * as Yup from "yup";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { AppDispatch, RootState } from "../../store/store";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,6 +22,16 @@ import {
 } from "../../contexts/securityFeatureSlice";
 import { setCurrentScreen } from "../../contexts/screenSlice";
 import { updateUserData } from "../../services/firebase/securityScreen.services";
+import { useFonts } from "expo-font";
+
+const contactValidationSchema = Yup.array()
+  .of(
+    Yup.string()
+      .matches(/^\d+$/, "Contact must be a number")
+      .length(10, "Contact number must be 10 digits")
+      .nullable()
+  )
+  .required("Contacts are required");
 
 const SOSButtonScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -35,6 +46,12 @@ const SOSButtonScreen = () => {
     const updatedContacts = [...SOSButtonContacts];
     while (updatedContacts.length < 3) updatedContacts.push("");
     return updatedContacts;
+  });
+
+  const [fontsLoaded] = useFonts({
+    Tajawal_Medium: require("../../../assets/Fonts/Tajawal-Medium.ttf"),
+    Tajawal_Bold: require("../../../assets/Fonts/Tajawal-Bold.ttf"),
+    Oxygen_Regular: require("../../../assets/Fonts/Oxygen-Regular.ttf"),
   });
 
   useEffect(() => {
@@ -56,28 +73,45 @@ const SOSButtonScreen = () => {
     const updatedContacts = [...contacts];
     updatedContacts[index] = text;
     setContacts(updatedContacts);
-    setIsChanged(true);
+    setIsChanged(
+      updatedContacts.some((contact, i) => contact !== SOSButtonContacts[i])
+    );
   };
 
   const handleSave = async () => {
     setLoading(true);
-    if (uid) {
-      const isSuccess = await updateUserData(uid, {
-        SOSButtonContacts: contacts,
-      });
-      if (isSuccess) {
-        dispatch(setSOSButtonContacts(contacts));
-        setLoading(false);
-        ToastAndroid.showWithGravity(
-          "SOS Button Contacts Saved",
-          ToastAndroid.BOTTOM,
-          ToastAndroid.LONG
-        );
-      } else {
-        Alert.alert("Failed to save contacts. Please try again.");
+    try {
+      await contactValidationSchema.validate(contacts, { abortEarly: false });
+
+      if (uid) {
+        const isSuccess = await updateUserData(uid, {
+          SOSButtonContacts: contacts,
+        });
+        if (isSuccess) {
+          dispatch(setSOSButtonContacts(contacts));
+          setLoading(false);
+          setIsChanged(false);
+          ToastAndroid.showWithGravity(
+            "SOS Button Contacts Saved",
+            ToastAndroid.BOTTOM,
+            ToastAndroid.LONG
+          );
+        } else {
+          Alert.alert("Failed to save contacts. Please try again.");
+        }
       }
+    } catch (error) {
+      if (error instanceof Yup.ValidationError) {
+        Alert.alert("Validation Error", error.errors.join("\n"));
+      }
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (!fontsLoaded) {
+    return <ActivityIndicator size="large" color="#9067c6" />;
+  }
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
@@ -96,7 +130,7 @@ const SOSButtonScreen = () => {
         {/* Image below description */}
         <Image
           source={{
-            uri: "https://res.cloudinary.com/desa0upux/image/upload/v1731178507/dwnplkw7sjrrxwgcehv5.png", 
+            uri: "https://res.cloudinary.com/desa0upux/image/upload/v1731178507/dwnplkw7sjrrxwgcehv5.png",
           }}
           style={styles.infoImage}
         />
@@ -121,7 +155,7 @@ const SOSButtonScreen = () => {
                   onPress={() => handleContactChange(index, "")}
                   style={styles.iconContainer}
                 >
-                  <AntDesign name="delete" size={20} color="red" />
+                  <AntDesign name="delete" size={20} color="red" />
                 </TouchableOpacity>
               ) : null}
             </View>
@@ -151,10 +185,10 @@ export default SOSButtonScreen;
 const styles = StyleSheet.create({
   heading: {
     fontSize: 24,
-    fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
     color: "#7A4791",
+    fontFamily: "Tajawal_Bold",
   },
   SOSButtonMainContainer: {
     padding: 20,
@@ -170,9 +204,10 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   infoText: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#333",
     marginBottom: 5,
+    fontFamily: "Oxygen_Regular",
   },
   infoImage: {
     width: "100%",
@@ -197,10 +232,10 @@ const styles = StyleSheet.create({
   },
   contactTitle: {
     fontSize: 18,
-    fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
     color: "#7A4791",
+    fontFamily: "Tajawal_Medium",
   },
   contactRow: {
     marginBottom: 10,
@@ -218,6 +253,7 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 16,
     color: "#7A4791",
+    fontFamily: "Tajawal_Medium",
   },
   iconContainer: {
     padding: 10,
@@ -232,12 +268,13 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: "Oxygen_Regular",
   },
   changeMessage: {
     fontSize: 14,
     color: "#f75252",
     marginTop: 5,
     textAlign: "center",
+    fontFamily: "Tajawal_Medium",
   },
 });

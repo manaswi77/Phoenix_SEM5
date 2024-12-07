@@ -1,14 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CurrentUser, UserSession } from "../types/types";
+import { CurrentUser, PostType, UserSession } from "../types/types";
 
 interface AppUser {
   user: CurrentUser | null;
   session: UserSession | null;
+  savedPosts: PostType[];
 }
 
 const initialState: AppUser = {
   user: null,
   session: null,
+  savedPosts: [],
 };
 
 const authSlice = createSlice({
@@ -27,16 +29,18 @@ const authSlice = createSlice({
       state.user = null;
       state.session = null;
     },
-
     updateUserProfile: (state, action: PayloadAction<Partial<CurrentUser>>) => {
       if (state.user) {
         state.user = { ...state.user, ...action.payload };
       }
     },
+    addPost: (state, action: PayloadAction<PostType>) => {
+      state.savedPosts.push(action.payload);
+    },
   },
 });
 
-export const { setUser, setSession, clearUser, updateUserProfile } =
+export const { setUser, setSession, clearUser, updateUserProfile, addPost } =
   authSlice.actions;
 
 export default authSlice.reducer;

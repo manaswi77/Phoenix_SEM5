@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Animated,
+  ActivityIndicator,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { setCurrentScreen } from "../contexts/screenSlice";
@@ -17,6 +18,7 @@ import HomeIcon from "../../assets/Icons/HomeIcon";
 import CommunityIcon from "../../assets/Icons/CommunityIcon";
 import SettingsIcon from "../../assets/Icons/SettingsIcon";
 import { setCurrentFeature } from "../contexts/securityFeatureSlice";
+import { useFonts } from "expo-font";
 
 const { width } = Dimensions.get("window");
 const TAB_WIDTH = width / 5;
@@ -61,6 +63,10 @@ const BottomNavigation: React.FC = () => {
     (state: RootState) => state.screen.currentScreen
   );
 
+  const [fontsLoaded] = useFonts({
+    Kanit_Light: require("../../assets/Fonts/Kanit-Light.ttf"),
+  });
+
   const handlePress = (screen: ScreenState) => {
     dispatch(setCurrentScreen(screen));
     if (screen === "security") {
@@ -71,6 +77,10 @@ const BottomNavigation: React.FC = () => {
   const getIconColor = (screenId: ScreenState) => {
     return currentScreen === screenId ? "#6A0DAD" : "#A9A9A9";
   };
+
+  if (!fontsLoaded) {
+    return <ActivityIndicator size="large" color="#9067c6" />;
+  }
 
   return (
     <>
@@ -156,6 +166,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
     color: "#000000",
     textAlign: "center",
+    fontFamily: "Kanit_Light",
   },
   selectedText: {
     color: "#8E24AA",

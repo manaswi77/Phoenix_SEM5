@@ -14,21 +14,21 @@ import {
   Vibration,
 } from "react-native";
 import React, { useEffect, useState } from "react";
+import * as Yup from "yup";
 import * as Location from "expo-location";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { AppDispatch, RootState } from "../../store/store";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setCurrentFeature,
-  setSafetyTimerState,
   updateSafetyTimerTimeInterval,
-  setSafetyTimerContacts,
 } from "../../contexts/securityFeatureSlice";
 import { setCurrentScreen } from "../../contexts/screenSlice";
 import { Picker } from "@react-native-picker/picker";
 import { updateUserData } from "../../services/firebase/securityScreen.services";
 import { sendSmsWithLocation } from "../../utils/notifications.utils";
 import { TEST_NUMBER } from "@env";
+import { useFonts } from "expo-font";
 
 const SecurityTimerScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -52,6 +52,12 @@ const SecurityTimerScreen: React.FC = () => {
     return updatedContacts;
   });
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+
+  const [fontsLoaded] = useFonts({
+    Tajawal_Medium: require("../../../assets/Fonts/Tajawal-Medium.ttf"),
+    Tajawal_Bold: require("../../../assets/Fonts/Tajawal-Bold.ttf"),
+    Oxygen_Regular: require("../../../assets/Fonts/Oxygen-Regular.ttf"),
+  });
 
   useEffect(() => {
     const backAction = () => {
@@ -97,6 +103,7 @@ const SecurityTimerScreen: React.FC = () => {
               `Timer set for ${hours} hours and ${minutes} minutes`,
               ToastAndroid.SHORT
             );
+            setLoading(false);
 
             // const timerDuration = (hours * 60 + minutes) * 60 * 1000;
             const timerDuration = 10000;
@@ -112,8 +119,6 @@ const SecurityTimerScreen: React.FC = () => {
       } catch (error) {
         console.error("Error saving data:", error);
         Alert.alert("Error", "Failed to save data.");
-      } finally {
-        setLoading(false);
       }
     }
   };
@@ -205,6 +210,10 @@ const SecurityTimerScreen: React.FC = () => {
       });
   };
 
+  if (!fontsLoaded) {
+    return <ActivityIndicator size="large" color="#9067c6" />;
+  }
+
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <Text style={styles.heading}>Safety Timer</Text>
@@ -294,16 +303,18 @@ const SecurityTimerScreen: React.FC = () => {
       <Modal visible={popupVisible} transparent animationType="slide">
         <View style={styles.overlay}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalText}>Are you safe?</Text>
+            <Text style={styles.modalText}>Are you Safe?</Text>
             <View style={styles.buttonContainer}>
               <TouchableOpacity
-                style={styles.modalButton}
+                style={styles.safeButton}
                 onPress={handleSafeAction}
               >
-                <Text style={{ color: "#fff" }}>I'm Safe</Text>
+                <Text style={{ color: "#fff", fontFamily: "Oxygen_Regular" }}>
+                  I'm Safe
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.modalButton}
+                style={styles.notSafeButton}
                 onPress={handleNotSafeAction}
               >
                 <Text style={{ color: "#fff" }}>I'm Not Safe</Text>
@@ -321,10 +332,10 @@ export default SecurityTimerScreen;
 const styles = StyleSheet.create({
   heading: {
     fontSize: 24,
-    fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
     color: "#7A4791",
+    fontFamily: "Tajawal_Bold",
   },
   safetyTimerMainContainer: {
     padding: 20,
@@ -340,9 +351,10 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   infoText: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#333",
     marginBottom: 5,
+    fontFamily: "Oxygen_Regular",
   },
   infoImage: {
     width: "100%",
@@ -375,10 +387,10 @@ const styles = StyleSheet.create({
   },
   timerTitle: {
     fontSize: 20,
-    fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
     color: "#7A4791",
+    fontFamily: "Tajawal_Medium",
   },
   safetyTimerInfoBottom: {
     padding: 10,
@@ -397,6 +409,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#e9ecef",
     borderRadius: 5,
     marginHorizontal: 10,
+    fontFamily: "Oxygen_Regular",
   },
   colon: {
     fontSize: 20,
@@ -419,10 +432,10 @@ const styles = StyleSheet.create({
   },
   contactTitle: {
     fontSize: 18,
-    fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
     color: "#7A4791",
+    fontFamily: "Tajawal_Medium",
   },
   contactRow: {
     marginBottom: 10,
@@ -438,8 +451,9 @@ const styles = StyleSheet.create({
   contactInput: {
     flex: 1,
     padding: 10,
-    fontSize: 16,
+    fontSize: 14,
     color: "#7A4791",
+    fontFamily: "Oxygen_Regular",
   },
   iconContainer: {
     padding: 10,
@@ -468,6 +482,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 16,
+    fontFamily: "Oxygen_Regular",
   },
   changeMessage: {
     fontSize: 14,
@@ -490,17 +505,24 @@ const styles = StyleSheet.create({
   },
   modalText: {
     fontSize: 18,
-    fontWeight: "bold",
     marginBottom: 20,
+    fontFamily: "Tajawal_Bold",
   },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
     width: "100%",
   },
-  modalButton: {
+  safeButton: {
     padding: 10,
-    backgroundColor: "#5D6D7E",
+    backgroundColor: "#18CE09",
+    borderRadius: 5,
+    alignItems: "center",
+    width: "40%",
+  },
+  notSafeButton: {
+    padding: 10,
+    backgroundColor: "red",
     borderRadius: 5,
     alignItems: "center",
     width: "40%",

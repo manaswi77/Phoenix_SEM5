@@ -6,18 +6,28 @@ import {
   StyleSheet,
   Image,
   SafeAreaView,
+  ActivityIndicator,
 } from "react-native";
 import { useDispatch } from "react-redux";
 import { setCurrentScreen } from "../../contexts/screenSlice";
 import { AppDispatch } from "../../store/store";
-import { auth } from "../../config/firebase.config";
+import { useFonts } from "expo-font";
 
 const WelcomeScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
+  const [fontsLoaded] = useFonts({
+    Faculty_Glyphic: require("../../../assets/Fonts/FacultyGlyphic-Regular.ttf"),
+    Kanit_Light: require("../../../assets/Fonts/Kanit-Light.ttf"),
+  });
+
   const handlePress = (screen: "login" | "register") => {
     dispatch(setCurrentScreen(screen));
   };
+
+  if (!fontsLoaded) {
+    return <ActivityIndicator size="large" color="#9067c6" />;
+  }
 
   return (
     <SafeAreaView style={styles.welcomeMainContainer}>
@@ -27,7 +37,7 @@ const WelcomeScreen: React.FC = () => {
         }}
         style={styles.image}
       />
-      <Text style={styles.title}>Welcome to Our App</Text>
+      <Text style={styles.title}>Safeguarded by Rakshita</Text>
       <View style={styles.welcomeScreenButtonContainer}>
         <TouchableOpacity
           style={[styles.button, styles.loginButton]}
@@ -56,13 +66,13 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: 150,
-    marginBottom: 40,
+    marginBottom: 4,
   },
   title: {
-    fontSize: 24,
-    fontFamily: "Montserrat-Bold",
-    marginBottom: 40,
+    fontSize: 20,
+    marginBottom: 30,
     color: "#6b5b95",
+    fontFamily: "Faculty_Glyphic",
   },
   welcomeScreenButtonContainer: {
     flexDirection: "row",
@@ -83,7 +93,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 16,
-    fontFamily: "Montserrat-SemiBold",
+    fontFamily: "Kanit_Light",
   },
 });
 

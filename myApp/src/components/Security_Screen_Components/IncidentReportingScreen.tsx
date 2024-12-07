@@ -21,6 +21,7 @@ import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
 import { saveIncidentReport } from "../../services/firebase/securityScreen.services";
 import { setCurrentScreen } from "../../contexts/screenSlice";
+import { useFonts } from "expo-font";
 
 const incidentReportingSchema = Yup.object().shape({
   name: Yup.string(),
@@ -36,6 +37,12 @@ const IncidentReportingScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const [fontsLoaded] = useFonts({
+    Tajawal_Medium: require("../../../assets/Fonts/Tajawal-Medium.ttf"),
+    Tajawal_Bold: require("../../../assets/Fonts/Tajawal-Bold.ttf"),
+    Oxygen_Regular: require("../../../assets/Fonts/Oxygen-Regular.ttf"),
+  });
 
   useEffect(() => {
     const backAction = () => {
@@ -85,6 +92,10 @@ const IncidentReportingScreen = () => {
       setLoading(false);
     }
   };
+
+  if (!fontsLoaded) {
+    return <ActivityIndicator size="large" color="#9067c6" />;
+  }
 
   return (
     <View style={styles.container}>
@@ -188,10 +199,34 @@ const IncidentReportingScreen = () => {
                   style={styles.picker}
                   onValueChange={handleChange("reportTo")}
                 >
-                  <Picker.Item label="Select an option" value="" />
-                  <Picker.Item label="Nirbhaya Pathak" value="nirbhayaPathak" />
-                  <Picker.Item label="Support Groups" value="supportGroups" />
-                  <Picker.Item label="Everyone" value="everyone" />
+                  <Picker.Item
+                    style={{
+                      fontFamily: "Oxygen_Regular",
+                    }}
+                    label="Select an option"
+                    value=""
+                  />
+                  <Picker.Item
+                    style={{
+                      fontFamily: "Oxygen_Regular",
+                    }}
+                    label="Nirbhaya Pathak"
+                    value="nirbhayaPathak"
+                  />
+                  <Picker.Item
+                    style={{
+                      fontFamily: "Oxygen_Regular",
+                    }}
+                    label="Support Groups"
+                    value="supportGroups"
+                  />
+                  <Picker.Item
+                    style={{
+                      fontFamily: "Oxygen_Regular",
+                    }}
+                    label="Everyone"
+                    value="everyone"
+                  />
                 </Picker>
                 {errors.reportTo && (
                   <Text style={styles.errorText}>{errors.reportTo}</Text>
@@ -221,10 +256,10 @@ export default IncidentReportingScreen;
 const styles = StyleSheet.create({
   heading: {
     fontSize: 24,
-    fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
     color: "#7A4791",
+    fontFamily: "Tajawal_Bold",
   },
   container: {
     flex: 1,
@@ -248,8 +283,9 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   infoText: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#333",
+    fontFamily: "Oxygen_Regular",
   },
   infoImage: {
     width: "100%",
@@ -268,7 +304,7 @@ const styles = StyleSheet.create({
   uploadButtonText: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: "Oxygen_Regular",
   },
   imagePreview: {
     width: 120,
@@ -287,6 +323,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     backgroundColor: "#fff",
     color: "#7A4791",
+    fontFamily: "Oxygen_Regular",
   },
   inputMultiline: {
     height: 100,
@@ -313,12 +350,13 @@ const styles = StyleSheet.create({
   submitButtonText: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: "Oxygen_Regular",
   },
   label: {
     fontSize: 16,
     color: "#333",
     marginBottom: 5,
+    fontFamily: "Oxygen_Regular",
   },
   picker: {
     height: 50,

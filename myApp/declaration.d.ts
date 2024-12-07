@@ -21,6 +21,8 @@ declare module "@env" {
   export const API_KEY_CLOUDINARY: string;
   export const API_SECRET_CLOUDINARY: string;
   export const TEST_NUMBER: string;
+  export const TEST_NUMBER2: string;
   export const BACKEND_URL: string;
   export const RAKSHITA_SERVER: string;
+  export const GEMINI_API_KEY: string;
 }

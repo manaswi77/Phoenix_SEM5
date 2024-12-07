@@ -40,15 +40,13 @@ export interface Comment {
   postID: string;
 }
 
-export interface Post {
+export interface PostType {
   id: string;
-  user: User;
-  postDescription: string;
-  postImage: string;
-  likes: number;
-  comments: Comment[];
-  createdAt: string;
-  tags: string[];
+  postedBy: string;
+  title: string;
+  desc: string;
+  category: string;
+  photoUrl: string;
 }
 
 export interface LikeResponse {

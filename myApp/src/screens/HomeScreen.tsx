@@ -16,11 +16,15 @@ import OnboardingScreen from "../components/Splash_Screen_Components/OnboardingS
 import { AppDispatch } from "../store/store";
 import { setIsLoggedIn, setCurrentScreen } from "../contexts/screenSlice";
 import { checkUserSession as checkUserSessionService } from "../services/database/UserSession.services";
+import EmergencyScreen from "../components/Home_Screen_Components/EmergencyScreen";
 
 const HomeScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   const isLoggedIn = useSelector((state: RootState) => state.screen.isLoggedIn);
+  const isEmergency = useSelector(
+    (state: RootState) => state.screen.isEmergency
+  );
   const currentScreen = useSelector(
     (state: RootState) => state.screen.currentScreen
   );
@@ -28,7 +32,7 @@ const HomeScreen: React.FC = () => {
   useEffect(() => {
     const fetchUserSession = async () => {
       // const isLoggedIn = await checkUserSessionService();
-      
+
       if (isLoggedIn) {
         dispatch(setIsLoggedIn(true));
         dispatch(setCurrentScreen("info"));
@@ -50,8 +54,6 @@ const HomeScreen: React.FC = () => {
         return <RegisterScreen />;
       case "info":
         return <InfoScreen />;
-      // case "home":
-      //   return <Home />;
       case "chatbot":
         return <ChatbotScreen />;
       case "community":
@@ -62,6 +64,8 @@ const HomeScreen: React.FC = () => {
         return <SecurityScreen />;
       case "forgotPassword":
         return <ForgotPasswordScreen />;
+      case "emergency":
+        return <EmergencyScreen />;
       // default:
       //   return <Home />;
     }
@@ -70,7 +74,7 @@ const HomeScreen: React.FC = () => {
   return (
     <View style={styles.mainContainer}>
       {renderScreen()}
-      {isLoggedIn && <BottomNavigation />}
+      {isLoggedIn && !isEmergency && <BottomNavigation />}
     </View>
   );
 };
@@ -78,7 +82,7 @@ const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    // backgroundColor: "#f8e6fc", 
+    // backgroundColor: "#f8e6fc",
     // backgroundColor: "#fcf6f2",
     backgroundColor: "#f0eff4",
     paddingTop: 5,

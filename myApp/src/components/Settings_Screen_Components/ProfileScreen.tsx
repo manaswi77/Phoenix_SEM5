@@ -9,22 +9,10 @@ import {
   SafeAreaView,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
-
-interface MenuItem {
-  icon: React.ComponentProps<typeof Feather>["name"];
-  title: string;
-}
-
-const menuItems: MenuItem[] = [
-  { icon: "edit", title: "Edit Profile" },
-  { icon: "bar-chart-2", title: "Chart and Report" },
-  { icon: "calendar", title: "Set Calender" },
-  { icon: "key", title: "Access Code" },
-  { icon: "bell", title: "Reminder" },
-  { icon: "help-circle", title: "Help" },
-];
 
 const ProfileScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"Information" | "Saved Posts">(
@@ -37,25 +25,16 @@ const ProfileScreen: React.FC = () => {
     user?.profilePhoto
   );
 
+  const handleForgot = () => {
+
+  }
+
   useEffect(() => {
     if (user) {
       setUsername(user.name);
       setProfilePicture(user.profilePhoto);
     }
   }, [user]);
-
-  const renderMenuItem = ({ icon, title }: MenuItem) => (
-    <TouchableOpacity key={title} style={styles.menuItem}>
-      <Feather name={icon} size={24} color="#333" />
-      <Text style={styles.menuItemText}>{title}</Text>
-      <Feather
-        name="chevron-right"
-        size={24}
-        color="#333"
-        style={styles.chevron}
-      />
-    </TouchableOpacity>
-  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -101,7 +80,46 @@ const ProfileScreen: React.FC = () => {
         </View>
         {activeTab === "Information" && (
           <View style={styles.menuContainer}>
-            {menuItems.map(renderMenuItem)}
+            <TouchableOpacity style={styles.menuItem}>
+              <AntDesign name="contacts" size={24} color="black" />
+              <Text style={styles.menuItemText}>Edit Contact Number</Text>
+              <Feather
+                name="chevron-right"
+                size={24}
+                color="#333"
+                style={styles.chevron}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.menuItem} onPress={handleForgot}>
+              <MaterialIcons name="password" size={24} color="black" />
+              <Text style={styles.menuItemText}>Change Password</Text>
+              <Feather
+                name="chevron-right"
+                size={24}
+                color="#333"
+                style={styles.chevron}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.menuItem}>
+              <Feather name="help-circle" size={24} color="black" />
+              <Text style={styles.menuItemText}>Help</Text>
+              <Feather
+                name="chevron-right"
+                size={24}
+                color="#333"
+                style={styles.chevron}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.menuItem}>
+              <AntDesign name="logout" size={24} color="black" />
+              <Text style={styles.menuItemText}>Log Out</Text>
+              <Feather
+                name="chevron-right"
+                size={24}
+                color="#333"
+                style={styles.chevron}
+              />
+            </TouchableOpacity>
           </View>
         )}
       </ScrollView>
