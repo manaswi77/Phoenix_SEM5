@@ -20,11 +20,9 @@ const authSlice = createSlice({
     setUser: (state, action: PayloadAction<CurrentUser>) => {
       state.user = action.payload;
     },
-
     setSession: (state, action: PayloadAction<UserSession>) => {
       state.session = action.payload;
     },
-
     clearUser: (state) => {
       state.user = null;
       state.session = null;

@@ -63,6 +63,7 @@ const LoginScreen: React.FC = () => {
         email: userInformation.email,
         name: userInformation.username,
         profilePhoto: userInformation.profilePhotoUrl,
+        contactNumber: userInformation.contactNumber,
       };
 
       console.log(userInformation);

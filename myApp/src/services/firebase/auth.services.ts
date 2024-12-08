@@ -135,10 +135,10 @@ const updateUserName = async (
     await updateDoc(userDocRef, { username });
     console.log("Username updated successfully.");
 
-    return true; 
+    return true;
   } catch (error) {
     console.error("Error updating username:", error);
-    return false; 
+    return false;
   }
 };
 
@@ -146,7 +146,7 @@ const updateContactNumber = async (
   uid: string,
   contactNumber: string
 ): Promise<boolean> => {
-  if (!uid || !contactNumber) {
+  if (!uid) {
     console.error("Invalid inputs: uid or contact number is missing.");
     return false;
   }

@@ -30,6 +30,7 @@ export interface CurrentUser {
   name: string;
   profilePhoto: string;
   email: string;
+  contactNumber: string;
 }
 
 export interface Comment {
