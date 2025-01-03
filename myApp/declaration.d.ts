@@ -27,4 +27,5 @@ declare module "@env" {
   export const GEMINI_API_KEY: string;
   export const PRESET_NAME: string;
   export const CLOUD_NAME: string;
+  export const WEB_CLIENT_ID: string;
 }

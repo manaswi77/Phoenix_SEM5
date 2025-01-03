@@ -26,7 +26,11 @@ import {
   setSOSButtonContacts,
   setSafetyTimerContacts,
 } from "../../contexts/securityFeatureSlice";
+import { WEB_CLIENT_ID } from "@env";
 import { useFonts } from "expo-font";
+import { FirebaseError } from "firebase/app";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { signInWithCredential, GoogleAuthProvider, User } from "@firebase/auth";
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
@@ -40,40 +44,31 @@ const LoginScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [loading, setLoading] = useState(false);
 
+  GoogleSignin.configure({
+    webClientId: WEB_CLIENT_ID,
+  });
+
   const [fontsLoaded] = useFonts({
     Faculty_Glyphic: require("../../../assets/Fonts/FacultyGlyphic-Regular.ttf"),
     Oxygen_Regular: require("../../../assets/Fonts/Oxygen-Regular.ttf"),
   });
 
-  const handleLogin = async (email: string, password: string) => {
-    setLoading(true);
+  const saveUserInformation = async (uid: User["uid"]) => {
     try {
-      const { user, accessToken } = await loginUser(email, password);
-
-      const userInformation = await getCurrentUserInfomation(user.uid);
-
-      ToastAndroid.showWithGravity(
-        "Login Successful",
-        ToastAndroid.LONG,
-        ToastAndroid.BOTTOM
-      );
+      const userInformation = await getCurrentUserInfomation(uid);
 
       const CurrentUserInfo: CurrentUser = {
-        uid: user.uid,
+        uid: uid,
         email: userInformation.email,
         name: userInformation.username,
         profilePhoto: userInformation.profilePhotoUrl,
         contactNumber: userInformation.contactNumber,
       };
 
-      console.log(userInformation);
-
       const CurrentUserSession: UserSession = {
-        token: accessToken,
+        token: "",
         isLoggedIn: true,
       };
-
-      console.log(userInformation.SOSButtonContacts);
 
       dispatch(setUser(CurrentUserInfo));
       dispatch(setSession(CurrentUserSession));
@@ -92,10 +87,84 @@ const LoginScreen: React.FC = () => {
           "",
         ]
       );
+    } catch (error: unknown) {
+      if (error instanceof FirebaseError) {
+        Alert.alert("Login Failed", error.message);
+      } else {
+        Alert.alert("Unknown Error Occurred", "Please try again later");
+      }
+    }
+  };
+
+  const handleLogin = async (
+    email: string,
+    password: string,
+    resetForm: () => void
+  ) => {
+    setLoading(true);
+    try {
+      const { user } = await loginUser(email, password);
+
+      if (!user.emailVerified) {
+        Alert.alert(
+          "Email Verification",
+          "Please verify your email and then Log in"
+        );
+        resetForm();
+        return;
+      }
+
+      await saveUserInformation(user.uid);
+
+      ToastAndroid.showWithGravity(
+        "Login Successful",
+        ToastAndroid.LONG,
+        ToastAndroid.BOTTOM
+      );
+
       dispatch(setIsLoggedIn(true));
       dispatch(setCurrentScreen("info"));
     } catch (error: any) {
       Alert.alert("Login Failed", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    try {
+      await GoogleSignin.signOut();
+
+      await GoogleSignin.hasPlayServices({
+        showPlayServicesUpdateDialog: true,
+      });
+
+      const userInfo = await GoogleSignin.signIn();
+      console.log("Google Sign-In User Info:", userInfo);
+      const idToken = userInfo.data?.idToken;
+
+      if (!idToken) {
+        throw new Error("Google Sign-In Error: No ID Token");
+      }
+
+      const googleCredential = GoogleAuthProvider.credential(idToken);
+      const { user } = await loginUser("", "", googleCredential);
+
+      await saveUserInformation(user.uid);
+
+      ToastAndroid.showWithGravity(
+        "Login Successful",
+        ToastAndroid.LONG,
+        ToastAndroid.BOTTOM
+      );
+
+      dispatch(setIsLoggedIn(true));
+      dispatch(setCurrentScreen("info"));
+    } catch (error) {
+      console.error("Google Sign-In Error:", error);
+      const errorMessage = (error as FirebaseError).message;
+      Alert.alert("Google Sign-In Error", errorMessage);
     } finally {
       setLoading(false);
     }
@@ -113,7 +182,9 @@ const LoginScreen: React.FC = () => {
       <Formik
         initialValues={{ email: "", password: "" }}
         validationSchema={LoginSchema}
-        onSubmit={({ email, password }) => handleLogin(email, password)}
+        onSubmit={({ email, password }, { resetForm }) => {
+          handleLogin(email, password, resetForm);
+        }}
       >
         {({
           handleChange,
@@ -168,26 +239,10 @@ const LoginScreen: React.FC = () => {
             </View>
 
             <View style={styles.loginOptionsContainer}>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={handleGoogleLogin}>
                 <Image
                   source={{
                     uri: "https://res.cloudinary.com/desa0upux/image/upload/v1726831946/fk6wxvosan61dh7slbcd.png",
-                  }}
-                  style={styles.loginOptionImage}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity>
-                <Image
-                  source={{
-                    uri: "https://res.cloudinary.com/desa0upux/image/upload/v1726910675/pwu1b4kdgpcbqrxvwq4y.jpg",
-                  }}
-                  style={styles.loginOptionImage}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity>
-                <Image
-                  source={{
-                    uri: "https://res.cloudinary.com/desa0upux/image/upload/v1726911153/cy5ac0gtxagrbr8zxkxq.jpg",
                   }}
                   style={styles.loginOptionImage}
                 />

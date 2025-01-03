@@ -129,7 +129,7 @@ const InfoScreen: React.FC = () => {
   };
 
   if (!fontsLoaded) {
-    return <ActivityIndicator size="large" color="#9067c6" />;
+    return null;
   }
 
   return (

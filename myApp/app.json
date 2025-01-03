@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "myApp",
+    "name": "Empower Her",
     "slug": "myApp",
     "version": "1.0.0",
     "newArchEnabled": true,
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/Images/AppLogo.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/LoadingScreenLogo.jpg",
+      "image": "./assets/Images/AppSplash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -19,15 +19,29 @@
     },
     "android": {
       "googleServicesFile": "./google-services.json",
-      "package": "com.mycorp.myapp",
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+      "package": "com.mycorp.myapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-font", "expo-sqlite"]
+    "plugins": [
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/Images/AppSplash.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ],
+      "@react-native-google-signin/google-signin"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "1abe91de-7e1f-49ae-a2ad-31481b8d16fd"
+      }
+    },
+    "owner": "terminatorshri"
   }
 }

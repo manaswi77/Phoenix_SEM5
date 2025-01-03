@@ -1,7 +1,9 @@
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithCredential,
   getIdToken,
+  User,
 } from "firebase/auth";
 import { auth, firestore } from "../../config/firebase.config";
 import {
@@ -16,22 +18,29 @@ import {
 import AppData from "../../../assets/AppAssets.json";
 
 /**
- * Log in a user with email and password
+ * Log in a user with email and password or Google credential
  * @param email - User's email
  * @param password - User's password
+ * @param googleCredential - Google credential
  */
-const loginUser = async (email: string, password: string) => {
+const loginUser = async (
+  email?: string,
+  password?: string,
+  googleCredential?: any
+) => {
   try {
-    // Sign in the user with Firebase Authentication
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
+    let userCredential;
+    if (googleCredential) {
+      userCredential = await signInWithCredential(auth, googleCredential);
+    } else {
+      userCredential = await signInWithEmailAndPassword(
+        auth,
+        email!,
+        password!
+      );
+    }
     const user = userCredential.user;
-
     const accessToken = await getIdToken(user, true);
-
     return { user, accessToken };
   } catch (error) {
     throw error;
@@ -82,6 +91,35 @@ const registerUser = async (
     return { user, accessToken };
   } catch (error) {
     console.error("Error registering user:", error);
+    throw error;
+  }
+};
+
+const registerSocialUser = async (user: User) => {
+  try {
+    const randomIndx = Math.floor(
+      Math.random() * AppData.profilePictures.length
+    );
+    const randomProfilePic = AppData.profilePictures[randomIndx];
+
+    const userData = {
+      uid: user.uid,
+      email: user.email,
+      username: user.displayName,
+      profilePhotoUrl: randomProfilePic,
+      contactNumber: "",
+      SOSButtonContacts: ["", "", ""],
+      SafetyTimerContacts: ["", "", ""],
+      SafetyTimerInterval: [0, 15],
+      savedPosts: [],
+      createdAt: new Date(),
+    };
+
+    await setDoc(doc(firestore, "users", user.uid), userData);
+
+    return { user };
+  } catch (error) {
+    console.error("Error registering social user:", error);
     throw error;
   }
 };
@@ -168,4 +206,5 @@ export {
   getCurrentUserInfomation,
   updateUserName,
   updateContactNumber,
+  registerSocialUser,
 };

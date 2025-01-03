@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Keyboard } from "react-native";
+import { View, StyleSheet, Keyboard, StatusBar } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import WelcomeScreen from "../components/Home_Screen_Components/WelcomeScreen";
 import LoginScreen from "../components/Home_Screen_Components/LoginScreen";
@@ -15,11 +15,27 @@ import { RootState } from "../store/store";
 import OnboardingScreen from "../components/Splash_Screen_Components/OnboardingScreen";
 import { AppDispatch } from "../store/store";
 import { setIsLoggedIn, setCurrentScreen } from "../contexts/screenSlice";
-import { checkUserSession as checkUserSessionService } from "../services/database/UserSession.services";
 import EmergencyScreen from "../components/Home_Screen_Components/EmergencyScreen";
+import { auth } from "../config/firebase.config";
+import { onAuthStateChanged, User } from "@firebase/auth";
+import { getCurrentUserInfomation } from "../services/firebase/auth.services";
+import * as SplashScreen from "expo-splash-screen";
+import { setUser } from "../contexts/userSlice";
+import { CurrentUser, UserSession } from "../types/types";
+import {
+  setSafetyTimerContacts,
+  setSOSButtonContacts,
+  updateSafetyTimerTimeInterval,
+} from "../contexts/securityFeatureSlice";
+
+SplashScreen.preventAutoHideAsync();
 
 const HomeScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [userInformationLoading, setUserInformationLoading] = useState(false);
 
   const isLoggedIn = useSelector((state: RootState) => state.screen.isLoggedIn);
   const isEmergency = useSelector(
@@ -33,17 +49,77 @@ const HomeScreen: React.FC = () => {
   const [iseKeyboardVisible, setIsKeyboardVisible] = useState<boolean>(false);
 
   useEffect(() => {
-    const fetchUserSession = async () => {
-      // const isLoggedIn = await checkUserSessionService();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      setIsInitializing(false);
+    });
 
-      if (isLoggedIn) {
-        dispatch(setIsLoggedIn(true));
-        dispatch(setCurrentScreen("info"));
-      }
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (!isInitializing && !userInformationLoading) {
+      SplashScreen.hideAsync();
+    }
+  }, [isInitializing]);
+
+  useEffect(() => {
+    const getUserInfo = async (id: User["uid"]) => {
+      const userInformation = await getCurrentUserInfomation(id);
+
+      if (!currentUser) return;
+
+      const CurrentUserInfo: CurrentUser = {
+        uid: currentUser.uid,
+        email: userInformation.email,
+        name: userInformation.username,
+        profilePhoto: userInformation.profilePhotoUrl,
+        contactNumber: userInformation.contactNumber,
+      };
+
+      console.log(userInformation);
+
+      console.log(userInformation.SOSButtonContacts);
+
+      dispatch(setUser(CurrentUserInfo));
+      dispatch(
+        updateSafetyTimerTimeInterval(
+          userInformation.SafetyTimerInterval || [0, 15]
+        )
+      );
+      dispatch(
+        setSOSButtonContacts(userInformation.SOSButtonContacts) || ["", "", ""]
+      );
+      dispatch(
+        setSafetyTimerContacts(userInformation.SafetyTimerContacts) || [
+          "",
+          "",
+          "",
+        ]
+      );
     };
 
-    fetchUserSession();
-  }, []);
+    if (isInitializing) return;
+
+    if (
+      currentUser &&
+      currentUser.emailVerified &&
+      !isLoggedIn &&
+      currentScreen !== "register" &&
+      currentScreen !== "login"
+    ) {
+      setUserInformationLoading(true);
+
+      getUserInfo(currentUser.uid);
+
+      setUserInformationLoading(false);
+      dispatch(setIsLoggedIn(true));
+      dispatch(setCurrentScreen("info"));
+    } else if (!currentUser && isLoggedIn) {
+      dispatch(setIsLoggedIn(false));
+      dispatch(setCurrentScreen("welcome"));
+    }
+  }, [currentUser, isInitializing]);
 
   useEffect(() => {
     const keyboardShowListener = Keyboard.addListener("keyboardDidShow", () =>
@@ -59,6 +135,10 @@ const HomeScreen: React.FC = () => {
       keyboardHideListener.remove();
     };
   }, []);
+
+  if (isInitializing) {
+    return null;
+  }
 
   const renderScreen = () => {
     switch (currentScreen) {
@@ -91,6 +171,7 @@ const HomeScreen: React.FC = () => {
 
   return (
     <View style={styles.mainContainer}>
+      <StatusBar barStyle="light-content" backgroundColor="black" />
       {renderScreen()}
       {isLoggedIn && !isEmergency && !iseKeyboardVisible && !isChatbot && (
         <BottomNavigation />

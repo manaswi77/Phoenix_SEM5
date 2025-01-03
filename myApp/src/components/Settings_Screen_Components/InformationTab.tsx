@@ -17,6 +17,7 @@ import { AppDispatch, RootState } from "../../store/store";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../../config/firebase.config";
 import { updateContactNumber } from "../../services/firebase/auth.services";
+import { setIsLoggedIn, setCurrentScreen } from "../../contexts/screenSlice";
 
 const InformationTab: React.FC = () => {
   const uid = useSelector((state: RootState) => state.appUser.user?.uid);
@@ -144,6 +145,28 @@ const InformationTab: React.FC = () => {
           setEmail(null);
         });
     }
+  };
+
+  const handleLogout = () => {
+    Alert.alert(
+      "Log Out",
+      "Are you sure you want to log out?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: async () => {
+            await auth.signOut();
+            dispatch(setIsLoggedIn(false));
+            dispatch(setCurrentScreen("welcome"));
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
 
   return (
@@ -301,7 +324,7 @@ const InformationTab: React.FC = () => {
       </TouchableOpacity>
 
       {/* Log Out Section */}
-      <TouchableOpacity style={styles.menuItem}>
+      <TouchableOpacity style={styles.menuItem} onPress={() => handleLogout()}>
         <View style={styles.menuItemName}>
           <AntDesign name="logout" size={24} color="black" />
           <Text style={styles.menuItemText}>Log Out</Text>

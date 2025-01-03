@@ -16,15 +16,31 @@ import {
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useDispatch } from "react-redux";
-import { setIsLoggedIn, setCurrentScreen } from "../../contexts/screenSlice";
+import { setCurrentScreen, setIsLoggedIn } from "../../contexts/screenSlice";
 import { AppDispatch } from "../../store/store";
-import { CurrentUser, UserSession } from "../../types/types";
 import {
-  registerUser,
   getCurrentUserInfomation,
+  registerUser,
+  registerSocialUser,
 } from "../../services/firebase/auth.services";
-import { setUser, setSession } from "../../contexts/userSlice";
+import {
+  sendEmailVerification,
+  GoogleAuthProvider,
+  signInWithCredential,
+  User,
+} from "firebase/auth";
+import { WEB_CLIENT_ID } from "@env";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useFonts } from "expo-font";
+import { FirebaseError } from "firebase/app";
+import { auth } from "@/src/config/firebase.config";
+import { CurrentUser, UserSession } from "@/src/types/types";
+import { setSession, setUser } from "@/src/contexts/userSlice";
+import {
+  setSafetyTimerContacts,
+  setSOSButtonContacts,
+  updateSafetyTimerTimeInterval,
+} from "@/src/contexts/securityFeatureSlice";
 
 const RegisterSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
@@ -38,6 +54,10 @@ const RegisterScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [loading, setLoading] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  GoogleSignin.configure({
+    webClientId: WEB_CLIENT_ID,
+  });
 
   const [fontsLoaded] = useFonts({
     Faculty_Glyphic: require("../../../assets/Fonts/FacultyGlyphic-Regular.ttf"),
@@ -59,21 +79,114 @@ const RegisterScreen: React.FC = () => {
     };
   }, []);
 
-  const handleRegister = async (values: {
-    email: string;
-    password: string;
-    confirmPassword: string;
-    username: string;
-  }) => {
+  const saveUserInformation = async (uid: User["uid"]) => {
+    try {
+      const userInformation = await getCurrentUserInfomation(uid);
+
+      const CurrentUserInfo: CurrentUser = {
+        uid: uid,
+        email: userInformation.email,
+        name: userInformation.username,
+        profilePhoto: userInformation.profilePhotoUrl,
+        contactNumber: userInformation.contactNumber,
+      };
+
+      const CurrentUserSession: UserSession = {
+        token: "",
+        isLoggedIn: true,
+      };
+
+      dispatch(setUser(CurrentUserInfo));
+      dispatch(setSession(CurrentUserSession));
+      dispatch(
+        updateSafetyTimerTimeInterval(
+          userInformation.SafetyTimerInterval || [0, 15]
+        )
+      );
+      dispatch(
+        setSOSButtonContacts(userInformation.SOSButtonContacts) || ["", "", ""]
+      );
+      dispatch(
+        setSafetyTimerContacts(userInformation.SafetyTimerContacts) || [
+          "",
+          "",
+          "",
+        ]
+      );
+    } catch (error: unknown) {
+      if (error instanceof FirebaseError) {
+        Alert.alert("Login Failed", error.message);
+      } else {
+        Alert.alert("Unknown Error Occurred", "Please try again later");
+      }
+    }
+  };
+
+  const handleRegister = async (
+    values: {
+      email: string;
+      password: string;
+      confirmPassword: string;
+      username: string;
+    },
+    resetForm: () => void
+  ) => {
     setLoading(true);
     try {
-      const { user, accessToken } = await registerUser(
+      const { user } = await registerUser(
         values.email,
         values.password,
         values.username
       );
 
-      const userInformation = await getCurrentUserInfomation(user.uid);
+      resetForm();
+
+      await sendEmailVerification(user);
+
+      Alert.alert(
+        "A verification email has been sent to your email address.",
+        "",
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              dispatch(setIsLoggedIn(false));
+              dispatch(setCurrentScreen("login"));
+            },
+          },
+        ]
+      );
+    } catch (error: any) {
+      Alert.alert("Registration failed");
+      console.error("Registration error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignUp = async () => {
+    setLoading(true);
+    try {
+      await GoogleSignin.signOut();
+
+      await GoogleSignin.hasPlayServices({
+        showPlayServicesUpdateDialog: true,
+      });
+
+      const userInfo = await GoogleSignin.signIn();
+      console.log("Google Sign-In User Info:", userInfo);
+      const idToken = userInfo.data?.idToken;
+
+      if (!idToken) {
+        throw new Error("Google Sign-In Error: No ID Token");
+      }
+
+      const googleCredential = GoogleAuthProvider.credential(idToken);
+      const userCredential = await signInWithCredential(auth, googleCredential);
+
+      await registerSocialUser(userCredential.user);
+
+      await saveUserInformation(userCredential.user.uid);
 
       ToastAndroid.showWithGravity(
         "Registration Successful",
@@ -81,27 +194,12 @@ const RegisterScreen: React.FC = () => {
         ToastAndroid.BOTTOM
       );
 
-      const CurrentUserInfo: CurrentUser = {
-        uid: user.uid,
-        email: userInformation.email,
-        name: userInformation.username,
-        profilePhoto: userInformation.photoURL,
-      };
-
-      const CurrentUserSession: UserSession = {
-        token: accessToken,
-        isLoggedIn: true,
-      };
-
-      dispatch(setUser(CurrentUserInfo));
-      dispatch(setSession(CurrentUserSession));
       dispatch(setIsLoggedIn(true));
       dispatch(setCurrentScreen("info"));
-
-      console.log("User registered successfully:", user);
-    } catch (error: any) {
-      Alert.alert("Registration failed");
-      console.error("Registration error:", error);
+    } catch (error) {
+      console.error("Google Sign-In Error:", error);
+      const errorMessage = (error as FirebaseError).message;
+      Alert.alert("Google Sign-In Error", errorMessage);
     } finally {
       setLoading(false);
     }
@@ -113,7 +211,7 @@ const RegisterScreen: React.FC = () => {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }} 
+      style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <View
@@ -133,7 +231,9 @@ const RegisterScreen: React.FC = () => {
             username: "",
           }}
           validationSchema={RegisterSchema}
-          onSubmit={handleRegister}
+          onSubmit={(values, { resetForm }) => {
+            handleRegister(values, resetForm);
+          }}
         >
           {({
             handleChange,
@@ -151,8 +251,8 @@ const RegisterScreen: React.FC = () => {
                 onBlur={handleBlur("username")}
                 value={values.username}
               />
-              {touched.email && errors.email ? (
-                <Text style={styles.inputError}>{errors.email}</Text>
+              {touched.username && errors.username ? (
+                <Text style={styles.inputError}>{errors.username}</Text>
               ) : null}
               <TextInput
                 placeholder="Email"
@@ -201,12 +301,12 @@ const RegisterScreen: React.FC = () => {
               </TouchableOpacity>
               <View style={styles.lineContainer}>
                 <View style={styles.line} />
-                <Text style={styles.registerOptionstext}>Or Login with</Text>
+                <Text style={styles.registerOptionstext}>Or Register with</Text>
                 <View style={styles.line} />
               </View>
 
               <View style={styles.registerOptionsContainer}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={handleGoogleSignUp}>
                   <Image
                     source={{
                       uri: "https://res.cloudinary.com/desa0upux/image/upload/v1726831946/fk6wxvosan61dh7slbcd.png",
@@ -214,26 +314,10 @@ const RegisterScreen: React.FC = () => {
                     style={styles.registerOptionImage}
                   />
                 </TouchableOpacity>
-                <TouchableOpacity>
-                  <Image
-                    source={{
-                      uri: "https://res.cloudinary.com/desa0upux/image/upload/v1726910675/pwu1b4kdgpcbqrxvwq4y.jpg",
-                    }}
-                    style={styles.registerOptionImage}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                  <Image
-                    source={{
-                      uri: "https://res.cloudinary.com/desa0upux/image/upload/v1726911153/cy5ac0gtxagrbr8zxkxq.jpg",
-                    }}
-                    style={styles.registerOptionImage}
-                  />
-                </TouchableOpacity>
               </View>
               <View style={styles.accExists}>
                 <Text style={styles.dontHaveAccountText}>
-                  Don't Have an Account ?{" "}
+                  Already have an account?{" "}
                 </Text>
                 <TouchableOpacity
                   onPress={() => dispatch(setCurrentScreen("login"))}

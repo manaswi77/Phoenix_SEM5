@@ -14,7 +14,6 @@ import {
   Vibration,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import * as Yup from "yup";
 import * as Location from "expo-location";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { AppDispatch, RootState } from "../../store/store";
@@ -105,8 +104,7 @@ const SecurityTimerScreen: React.FC = () => {
             );
             setLoading(false);
 
-            // const timerDuration = (hours * 60 + minutes) * 60 * 1000;
-            const timerDuration = 10000;
+            const timerDuration = (hours * 60 + minutes) * 60 * 1000;
             setTimeout(() => {
               setPopupVisible(true);
               Vibration.vibrate(5000);
